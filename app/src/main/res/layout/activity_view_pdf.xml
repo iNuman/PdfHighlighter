@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_ly"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <View
+        android:id="@+id/tittle_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:elevation="@dimen/_5sdp"
+        app:layout_constraintBottom_toTopOf="@id/pdf_reader_render_viewN"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/activity_back_btn"
+        android:layout_width="@dimen/_45sdp"
+        android:layout_height="0dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:elevation="@dimen/_5sdp"
+        android:focusable="true"
+        android:padding="18dp"
+        app:layout_constraintBottom_toBottomOf="@id/tittle_bar"
+        app:layout_constraintEnd_toStartOf="@id/title_tv"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/tittle_bar"
+        app:layout_constraintTop_toTopOf="@id/tittle_bar"
+        app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
+
+    <TextView
+        android:id="@+id/title_tv"
+        android:layout_width="0dp"
+        android:layout_height="?actionBarSize"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:gravity="center_vertical"
+        android:text="@string/example_title"
+        app:layout_constraintBottom_toBottomOf="@id/tittle_bar"
+        app:layout_constraintEnd_toStartOf="@id/delete_Annotation_btn"
+        app:layout_constraintStart_toEndOf="@id/activity_back_btn"
+        app:layout_constraintTop_toTopOf="@id/tittle_bar" />
+
+    <ImageView
+        android:id="@+id/delete_Annotation_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:contentDescription="@string/image_desc"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:paddingHorizontal="20dp"
+        android:src="@drawable/baseline_close_24"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/tittle_bar"
+        app:layout_constraintEnd_toStartOf="@id/text_search_btn"
+        app:layout_constraintStart_toEndOf="@id/title_tv"
+        app:layout_constraintTop_toTopOf="@id/tittle_bar" />
+
+    <ImageView
+        android:id="@+id/text_search_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:contentDescription="@string/image_desc"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:paddingHorizontal="20dp"
+        android:src="@drawable/search_text_ic"
+        app:layout_constraintBottom_toBottomOf="@id/tittle_bar"
+        app:layout_constraintEnd_toStartOf="@id/option_menu_btn"
+        app:layout_constraintStart_toEndOf="@id/delete_Annotation_btn"
+        app:layout_constraintTop_toTopOf="@id/tittle_bar" />
+
+
+    <ImageView
+        android:id="@+id/option_menu_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:contentDescription="@string/image_desc"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:paddingStart="1dp"
+        android:paddingEnd="12dp"
+        android:src="@drawable/doc_option_ic"
+        app:layout_constraintBottom_toBottomOf="@id/tittle_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/text_search_btn"
+        app:layout_constraintTop_toTopOf="@id/tittle_bar" />
+
+    <View
+        android:id="@+id/border"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_1sdp"
+        android:background="#F4F1F1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tittle_bar" />
+
+    <com.artifex.mupdfdemo.MuPDFReaderView
+        android:id="@+id/pdf_reader_render_viewN"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/border" />
+
+    <View
+        android:id="@+id/backView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/border" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/pagerCenter_ly"
+        android:layout_width="@dimen/_130sdp"
+        android:layout_height="@dimen/_130sdp"
+        android:visibility="gone"
+        android:backgroundTint="@color/colorAccentTrans"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/currentPageTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:paddingVertical="@dimen/_25sdp"
+            android:singleLine="true"
+            android:text=""
+            android:textAlignment="center"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/center_v"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/colorDarkTrans"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/currentPageTv" />
+
+        <TextView
+            android:id="@+id/totalPageTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:paddingVertical="@dimen/_25sdp"
+            android:singleLine="true"
+            android:text="of "
+            android:textAlignment="center"
+            android:textColor="@color/colorAccentTrans"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/center_v" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--    <com.xenstudio.tools.pdf.reader.editor.document.customView.CustomVerticalSeekBar-->
+<!--        android:id="@+id/vertical_seekbar"-->
+<!--        android:layout_width="50dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:progress="20"-->
+<!--        android:visibility="gone"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/bottomOptionRecycler"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/border" />-->
+
+    <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="-20dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomOptionRecycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/border">
+
+        <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
+            android:id="@+id/mySeekBar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:progress="1"
+            android:visibility="gone"
+            android:progressBackgroundTint="@android:color/transparent"
+            android:progressTint="@android:color/transparent"
+            android:splitTrack="false"
+            app:seekBarRotation="CW90" /> <!-- Rotation: CW90 or CW270 -->
+    </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/horizontalSeekSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:progress="1"
+        android:layout_marginBottom="-20dp"
+        android:progressBackgroundTint="@android:color/transparent"
+        android:progressTint="@android:color/transparent"
+        app:layout_constraintBottom_toTopOf="@id/bottomOptionRecycler" />
+
+
+    <FrameLayout
+        android:id="@+id/frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/border">
+
+        <TextView
+            android:id="@+id/copyBtnSecond"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:padding="4dp"
+            android:text="Copy"
+            android:visibility="gone"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            />
+    </FrameLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bottomOptionRecycler"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_55sdp"
+        android:background="@color/white"
+        android:elevation="5dp"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:spanCount="5"
+        tools:listitem="@layout/bottom_rv_layout" />
+
+
+    <View
+        android:id="@+id/layout_back_view"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:background="@color/cardview_dark_background"
+        android:elevation="10dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/draw_layout"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_150sdp"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/colorRecycler"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/brushSizeSlider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            tools:listitem="@layout/content_color_recycler" />
+
+        <ImageView
+            android:id="@+id/brushIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:src="@drawable/minus_ic"
+            app:layout_constraintBottom_toBottomOf="@id/brushSizeSlider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/colorRecycler"
+            app:layout_constraintVertical_bias="0.04000002" />
+
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/brushSizeSlider"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="-25dp"
+            android:value="10"
+            android:valueFrom="0"
+            android:valueTo="100"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/brush_decrease_Icon"
+            app:layout_constraintStart_toEndOf="@id/brushIcon"
+            app:layout_constraintTop_toBottomOf="@id/colorRecycler" />
+
+        <ImageView
+            android:id="@+id/brush_decrease_Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:src="@drawable/plus_ic"
+            app:layout_constraintBottom_toBottomOf="@id/brushSizeSlider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/colorRecycler"
+            app:layout_constraintVertical_bias="0.04000002" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/text_page_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner_shape_outline"
+        android:padding="@dimen/_15sdp"
+        android:text="sample"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/tools_layout"
+        layout="@layout/pdf_edit_layout"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <include
+        android:id="@+id/search_action_ly"
+        layout="@layout/search_layout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

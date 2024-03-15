@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="text_color">#EBE4EA</color>
+    <color name="primary_color_code">#94147F</color>
+    <color name="pspdf__color_signature_yellow">#FFEB3B</color>
+    <color name="pspdf__color_gray_light">#E0E0E0</color>
+    <color name="pspdf__color_white">#FFFFFF</color>
+
+</resources>

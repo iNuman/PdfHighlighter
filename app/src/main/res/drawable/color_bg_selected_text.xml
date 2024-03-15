@@ -1,0 +1,5 @@
+<!-- res/drawable/color_bg_selected_text.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FF0000"/> <!-- Change the color value to your desired color -->
+</shape>

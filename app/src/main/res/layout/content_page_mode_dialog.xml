@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/reading_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Reading Mode"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/light_mode_btn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:drawablePadding="@dimen/_17sdp"
+        android:ellipsize="end"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingHorizontal="@dimen/_25sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:text="Light"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/dark_mode_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.36"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/reading_mode" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/dark_mode_btn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:drawablePadding="@dimen/_17sdp"
+        android:ellipsize="end"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingHorizontal="@dimen/_25sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:text="Dark"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/eyes_mode_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.36"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/light_mode_btn" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/eyes_mode_btn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:drawablePadding="@dimen/_17sdp"
+        android:ellipsize="end"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingHorizontal="@dimen/_25sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:text="Eyes Comfort "
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/view_mode_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.36"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dark_mode_btn" />
+
+    <TextView
+        android:id="@+id/view_mode_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/view_mode"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/eyes_mode_btn" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/horzontal_mode_btn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:drawablePadding="@dimen/_17sdp"
+        android:ellipsize="end"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingHorizontal="@dimen/_25sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:text="@string/horizontal"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/vertical_mode_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.36"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view_mode_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/vertical_mode_btn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:drawablePadding="@dimen/_17sdp"
+        android:ellipsize="end"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingHorizontal="@dimen/_25sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/continue_scroll_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.36"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horzontal_mode_btn" />
+
+    <!--
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/continue_scroll_btn"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:drawableStart="@drawable/slider_vertical"
+            android:drawableEnd="@drawable/circle_un_selector"
+            android:drawablePadding="@dimen/_17sdp"
+            android:ellipsize="end"
+            android:fontFamily="@font/roboto_medium"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_25sdp"
+            android:paddingVertical="@dimen/_15sdp"
+            android:text="continue scroll"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vertical_mode_btn" />
+    -->
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/continue_scroll_btn"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:drawablePadding="25dp"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/_25sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:text="Continue Scroll"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vertical_mode_btn" />
+
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchController"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:paddingHorizontal="20dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        app:layout_constraintBottom_toBottomOf="@id/continue_scroll_btn"
+        app:layout_constraintEnd_toEndOf="@id/continue_scroll_btn"
+        app:layout_constraintTop_toTopOf="@id/continue_scroll_btn" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

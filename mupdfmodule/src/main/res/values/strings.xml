@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MuPDF</string>
+
+    <string name="example_title">Example Title</string>
+    <string name="size">10MB</string>
+    <string name="moreactions">moreActions</string>
+    <string name="image_desc">pdfImage</string>
+    <string name="format_string_text">%1$s%2$s</string>
+    <string name="not_supported">File  format not supported </string>
+    <string name="serach_hint">Enter Text</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="cannot_open_buffer">Can not  open buffer</string>
+    <string name="cannot_open_document">Can not open file</string>
+    <string name="cannot_open_file_Path">can not open file path: %1$s</string>
+    <string name="choose_value">choose value</string>
+    <string name="copied_to_clipboard">copy to clipBoard</string>
+    <string name="copy_text">copy text</string>
+    <string name="dialog_title">dialog title</string>
+    <string name="document_has_changes_save_them">You\'ve made editing. Do you want to save?</string>
+    <string name="enter_password">enter password</string>
+    <string name="pdf_tools_accept">Accept</string>
+    <string name="pdf_tools_copy">copy</string>
+    <string name="pdf_tools_delete">delete</string>
+    <string name="pdf_tools_draw_annotation">draw</string>
+    <string name="pdf_tools_highlight">highlight</string>
+    <string name="pdf_tools_ink">tool ink</string>
+    <string name="pdf_tools_outline_title">Table of Contents</string>
+    <string name="pdf_tools_search">pdf Tool search</string>
+    <string name="pdf_tools_search_backwards">Search backwards</string>
+    <string name="pdf_tools_search_document">Search document</string>
+    <string name="pdf_tools_search_forwards">Search forwards</string>
+    <string name="pdf_tools_strike_out">strike</string>
+    <string name="pdf_tools_toggle_links">Highlight and enable links</string>
+    <string name="pdf_tools_toggle_reflow_mode" translatable="false">Toggle reflow mode</string>
+    <string name="pdf_tools_underline">underline</string>
+    <string name="searching">searching…</string>
+    <string name="select_certificate_and_sign">Select certificate and sign?</string>
+    <string name="select_text">Please select text</string>
+    <string name="signature_checked">Signature checked</string>
+    <string name="text_not_found">Content not found</string>
+    <string name="yes">yes</string>
+    <string name="horizontal">Horizontal</string>
+    <string name="horizontal_view_mode">Horizontal view mode</string>
+    <string name="vertical_view_mode">Vertical view mode</string>
+    <string name="view_mode">Page View Mode</string>
+    <string name="go_to_page">Go To Page</string>
+    <string name="reading_view_mode">Reading View Mode</string>
+    <string name="copy">Copy</string>
+    <string name="underline">Underline</string>
+    <string name="strikethrough">Strikethrough</string>
+    <string name="highlight">Highlight</string>
+    <string name="draw">draw</string>
+    <string name="circle_image">circleImage</string>
+    <string name="color_circle">colorCircle</string>
+    <string name="favourite_pdfs">Favourite Pdfs</string>
+    <string name="mark_favourite_button">mark favourite button</string>
+
+    <string name="no_media_warning">Storage media not present</string>
+    <string name="no_media_hint">Sharing the storage media with a PC can make it inaccessible</string>
+
+    <string name="search_backwards">Search backwards</string>
+    <string name="search_forwards">Search forwards</string>
+    <string name="search_document">Search document</string>
+    <string name="picker_title_App_Ver_Dir">%1$s %2$s: %3$s</string>
+    <string name="outline_title">Table of Contents</string>
+
+
+    <string name="searching_">Searching&#8230;</string>
+    <string name="toggle_links">Highlight and enable links</string>
+    <string name="no_further_occurrences_found">No further occurrences found</string>
+    <string name="select">Select</string>
+    <string name="search">Search</string>
+
+    <string name="strike_out">Strike-out</string>
+    <string name="delete">Delete</string>
+
+
+    <string name="edit_annotations">Edit annotations</string>
+    <string name="ink">Ink</string>
+    <string name="save">Save</string>
+    <string name="print">Print</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="parent_directory">[Up one level]</string>
+
+    <string name="no">No</string>
+    <string name="entering_reflow_mode">Entering reflow mode</string>
+    <string name="leaving_reflow_mode">Leaving reflow mode</string>
+    <string name="print_failed">Print failed</string>
+
+
+    <string name="no_text_selected">No text selected</string>
+    <string name="draw_annotation">Draw annotation</string>
+    <string name="nothing_to_save">Nothing to save</string>
+    <string name="document_has_changes_save_them_">Document has changes. Save them?</string>
+
+    <string name="cannot_open_document_Reason">Cannot open document: %1$s</string>
+
+    <string name="fill_out_text_field">Fill out text field</string>
+    <string name="okay">Okay</string>
+
+
+    <string name="copy_text_to_the_clipboard">Copy text to the clipboard</string>
+    <string name="more">More</string>
+    <string name="accept">Accept</string>
+
+    <string name="format_currently_not_supported">Format currently not supported</string>
+    <string name="toggle_reflow_mode">Toggle reflow mode</string>
+
+
+
+</resources>
