@@ -16,11 +16,6 @@
 #include "mupdf/pdf.h"
 
 
-
-
-//#define JNI_FN(A) Java_com_xenstudio_photo_pdfdocuments_ ## A
-//#define PACKAGENAME "com/xenstudio/photo/pdfdocuments"
-
 #define JNI_FN(A) Java_com_artifex_mupdfdemo_ ## A
 #define PACKAGENAME "com/artifex/mupdfdemo"
 #define LOG_TAG "libmupdf"

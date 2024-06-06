@@ -1,6 +1,6 @@
 package com.artifex.mupdfdemo;
 
-import static com.artifex.mupdfdemo.PageView.continueScrolling;
+//import static com.artifex.mupdfdemo.PageView.continueScrolling;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
@@ -20,7 +20,7 @@ public class Stepper {
     @SuppressLint("NewApi")
     public void prod() {
         if (!mPending) {
-            if(!continueScrolling){
+//            if(!continueScrolling){
                 mPending = true;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     mPoster.postOnAnimation(new Runnable() {
@@ -40,7 +40,7 @@ public class Stepper {
                     });
 
                 }
-            }
+//            }
         }
     }
 }

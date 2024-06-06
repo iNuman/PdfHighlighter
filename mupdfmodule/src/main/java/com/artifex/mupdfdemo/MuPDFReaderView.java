@@ -1,436 +1,309 @@
+//
+// Decompiled by Procyon v0.5.36
+//
+
 package com.artifex.mupdfdemo;
 
-import android.content.Context;
+import android.util.Log;
+import android.view.View;
+import android.view.ScaleGestureDetector;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
-import android.view.View;
-import android.view.WindowManager;
+import android.util.AttributeSet;
 
 import androidx.core.content.ContextCompat;
 
+import android.view.WindowManager;
+import android.util.DisplayMetrics;
+//import com.lonelypluto.pdflibrary.utils.SharedPreferencesUtil;
+//import com.lonelypluto.pdfviewerdemo.R;
+
+import android.content.Context;
 
 public class MuPDFReaderView extends ReaderView {
-
     private MuPDFReaderViewListener listener;
-
-    public enum Mode {Viewing, Selecting, Drawing, Undo, Redo}
-
     private final Context mContext;
-    private boolean mLinksEnabled = false;
-    private boolean isLinkHighlightColor = false;
-    private MuPDFReaderView.Mode mMode = MuPDFReaderView.Mode.Viewing;
-    private boolean tapDisabled = false;
+    private boolean mLinksEnabled;
+    private boolean isLinkHighlightColor;
+    private Mode mMode;
+    private boolean tapDisabled;
     private int tapPageMargin;
-
     private int mLinkHighlightColor;
+    private float mX;
+    private float mY;
+    private static final float TOUCH_TOLERANCE = 2.0f;
 
     protected void onTapMainDocArea() {
-        checkMuPDFReaderViewListener();
-        listener.onTapMainDocArea();
+        this.checkMuPDFReaderViewListener();
+        this.listener.onTapMainDocArea();
     }
 
     protected void onDocMotion() {
+        this.checkMuPDFReaderViewListener();
+        this.listener.onDocMotion();
+    }
+
+    protected void onHit(final Hit item) {
+        this.checkMuPDFReaderViewListener();
+        this.listener.onHit(item);
+    }
+
+    protected void onLongPress() {
         checkMuPDFReaderViewListener();
-        listener.onDocMotion();
+        this.listener.onLongPress();
     }
 
-    protected void onHit(Hit item) {
-        checkMuPDFReaderViewListener();
-        listener.onHit(item);
-    }
-    protected void onLongPress(){
-        checkMuPDFReaderViewListener();
-        listener.onLongPress();
+    public void setLinksEnabled(final boolean b) {
+        this.mLinksEnabled = b;
+        this.resetupChildren();
     }
 
-    /**
-     * Set whether hyperlinks are highlighted
-     *
-     * @param b
-     */
-    public void setLinksEnabled(boolean b) {
-        mLinksEnabled = b;
-        resetupChildren();
+    public void setLinkHighlightColor(final int color) {
+        this.isLinkHighlightColor = true;
+        this.mLinkHighlightColor = color;
+        this.resetupChildren();
     }
 
-    /**
-     * Set hyperlink color
-     *
-     * @param color color value
-     */
-    public void setLinkHighlightColor(int color) {
-        isLinkHighlightColor = true;
-        mLinkHighlightColor = color;
-        resetupChildren();
+    public void setSearchTextColor(final int color) {
+        SharedPreferencesUtil.put("sp_color_search_text", color);
+        this.resetupChildren();
     }
 
-    /**
-     * Set search text color
-     *
-     * @param color color value
-     */
-    public void setSearchTextColor(int color) {
-        SharedPreferencesUtil.put(SPConsts.SP_COLOR_SEARCH_TEXT, color);
-        resetupChildren();
+    public void setInkColor(final int color) {
+        ((MuPDFView) this.getCurrentView()).setInkColor(color);
     }
 
-    /**
-     * Set brush color
-     *
-     * @param color color value
-     */
-    public void setInkColor(int color) {
-//		SharedPreferencesUtil.put(SPConsts.SP_COLOR_SEARCH_TEXT, color);
-        ((MuPDFView) getCurrentView()).setInkColor(color);
-    }
-
-    /**
-     * Set brush thickness
-     *
-     * @param inkThickness thickness value
-     */
-    public void setPaintStrockWidth(float inkThickness) {
-//		SharedPreferencesUtil.put(SPConsts.SP_COLOR_SEARCH_TEXT, color);
-        ((MuPDFView) getCurrentView()).setPaintStrockWidth(inkThickness);
+    public void setPaintStrockWidth(final float inkThickness) {
+        ((MuPDFView) this.getCurrentView()).setPaintStrockWidth(inkThickness);
     }
 
     public float getCurrentScale() {
-        return ((MuPDFView) getCurrentView()).getCurrentScale();
+        return ((MuPDFView) this.getCurrentView()).getCurrentScale();
     }
 
-    public void setMode(MuPDFReaderView.Mode m) {
-        mMode = m;
+    public void setMode(final Mode m) {
+        this.mMode = m;
+    }
+
+    public Mode getMode() {
+        return mMode;
     }
 
     private void setup() {
-        // Get the screen size etc to customise tap margins.
-        // We calculate the size of 1 inch of the screen for tapping.
-        // On some devices the dpi values returned are wrong, so we
-        // sanity check it: we first restrict it so that we are never
-        // less than 100 pixels (the smallest Android device screen
-        // dimension I've seen is 480 pixels or so). Then we check
-        // to ensure we are never more than 1/5 of the screen width.
-        DisplayMetrics dm = new DisplayMetrics();
-        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        final DisplayMetrics dm = new DisplayMetrics();
+        final WindowManager wm = (WindowManager) this.mContext.getSystemService(Context.WINDOW_SERVICE);
         wm.getDefaultDisplay().getMetrics(dm);
-        tapPageMargin = (int) dm.xdpi;
-        if (tapPageMargin < 100) {
-            tapPageMargin = 100;
+        this.tapPageMargin = (int) dm.xdpi;
+        if (this.tapPageMargin < 100) {
+            this.tapPageMargin = 100;
         }
-        if (tapPageMargin > dm.widthPixels / 5) {
-            tapPageMargin = dm.widthPixels / 5;
+        if (this.tapPageMargin > dm.widthPixels / 5) {
+            this.tapPageMargin = dm.widthPixels / 5;
         }
-        // set view backgroundColor
-        setBackgroundColor(ContextCompat.getColor(mContext, R.color.muPDFReaderView_bg));
+        this.setBackgroundColor(ContextCompat.getColor(this.mContext, R.color.muPDFReaderView_bg));
     }
 
-    public MuPDFReaderView(Context context) {
+    public MuPDFReaderView(final Context context) {
         super(context);
-        mContext = context;
-        setup();
+        this.mLinksEnabled = false;
+        this.isLinkHighlightColor = false;
+        this.mMode = Mode.Viewing;
+        this.tapDisabled = false;
+        this.mContext = context;
+        this.setup();
     }
 
-    public MuPDFReaderView(Context context, AttributeSet attrs) {
+    public MuPDFReaderView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
-        setup();
-
+        this.mLinksEnabled = false;
+        this.isLinkHighlightColor = false;
+        this.mMode = Mode.Viewing;
+        this.tapDisabled = false;
+        this.mContext = context;
+        this.setup();
     }
-/*onSingleTapUp got null object reference crash */
 
-    //  Method triggered by clicking the screen to turn the page
-/*    public boolean onSingleTapUp(MotionEvent e) {
-        LinkInfo link;
-        if (mMode == MuPDFReaderView.Mode.Viewing && !tapDisabled) {
-            MuPDFView pageView = (MuPDFView) getDisplayedView();
-*//*          commented by me due to crash
-  Hit item = pageView.passClickEvent(e.getX(), e.getY());
-            onHit(item);
+    @Override
+    public boolean onSingleTapUp(final MotionEvent e) {
+        if (this.mMode == Mode.Viewing && !this.tapDisabled) {
+            final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
+            final Hit item = pageView.passClickEvent(e.getX(), e.getY());
+            this.onHit(item);
             if (item == Hit.Nothing) {
-                if (mLinksEnabled && (link = pageView.hitLink(e.getX(), e.getY())) != null) {
+                final LinkInfo link;
+                if (this.mLinksEnabled && (link = pageView.hitLink(e.getX(), e.getY())) != null) {
                     link.acceptVisitor(new LinkInfoVisitor() {
                         @Override
-                        public void visitInternal(LinkInfoInternal li) {
-                            // Clicked on an internal (GoTo) link
-                            setDisplayedViewIndex(li.pageNumber);
+                        public void visitInternal(final LinkInfoInternal li) {
+                            MuPDFReaderView.this.setDisplayedViewIndex(li.pageNumber);
                         }
 
                         @Override
-                        public void visitExternal(LinkInfoExternal li) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri
-                                    .parse(li.url));
-                            mContext.startActivity(intent);
+                        public void visitExternal(final LinkInfoExternal li) {
+                            final Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(li.url));
+                            MuPDFReaderView.this.mContext.startActivity(intent);
                         }
 
                         @Override
-                        public void visitRemote(LinkInfoRemote li) {
-                            // Clicked on a remote (GoToR) link
+                        public void visitRemote(final LinkInfoRemote li) {
                         }
                     });
-                } else if (e.getX() < tapPageMargin) {
+                } else if (e.getX() < this.tapPageMargin) {
                     super.smartMoveBackwards();
-                } else if (e.getX() > super.getWidth() - tapPageMargin) {
+                } else if (e.getX() > super.getWidth() - this.tapPageMargin) {
                     super.smartMoveForwards();
-                } else if (e.getY() < tapPageMargin) {
+                } else if (e.getY() < this.tapPageMargin) {
                     super.smartMoveBackwards();
-                } else if (e.getY() > super.getHeight() - tapPageMargin) {
-                    super.smartMoveForwards();
-                } else {
-                    onTapMainDocArea();
-                }
-            }*//*
-        }
-        return super.onSingleTapUp(e);
-    }*/
-
-    public boolean onSingleTapUp(MotionEvent e) {
-        LinkInfo link;
-
-        if (mMode == Mode.Viewing && !tapDisabled) {
-            MuPDFView pageView = (MuPDFView) getDisplayedView();
-            Hit item = pageView.passClickEvent(e.getX(), e.getY());
-            onHit(item);
-            if (item == Hit.Nothing) {
-                if (mLinksEnabled && (link = pageView.hitLink(e.getX(), e.getY())) != null) {
-//                    link.acceptVisitor(new LinkInfoVisitor() {
-//                        @Override
-//                        public void visitInternal(LinkInfoInternal li) {
-//                            // Clicked on an internal (GoTo) link
-//                            setDisplayedViewIndex(li.pageNumber);
-//                        }
-//
-//                        @Override
-//                        public void visitExternal(LinkInfoExternal li) {
-//                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri
-//                                    .parse(li.url));
-//                            mContext.startActivity(intent);
-//                        }
-//
-//                        @Override
-//                        public void visitRemote(LinkInfoRemote li) {
-//                            // Clicked on a remote (GoToR) link
-//                        }
-//                    });
-                } else if (e.getX() < tapPageMargin) {
-                    super.smartMoveBackwards();
-                } else if (e.getX() > super.getWidth() - tapPageMargin) {
-                    super.smartMoveForwards();
-                } else if (e.getY() < tapPageMargin) {
-                    super.smartMoveBackwards();
-                } else if (e.getY() > super.getHeight() - tapPageMargin) {
+                } else if (e.getY() > super.getHeight() - this.tapPageMargin) {
                     super.smartMoveForwards();
                 } else {
-                    onTapMainDocArea();
+                    this.onTapMainDocArea();
                 }
             }
         }
         return super.onSingleTapUp(e);
     }
 
-
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                            float distanceY) {
-        MuPDFView pageView = (MuPDFView) getDisplayedView();
-        switch (mMode) {
-            case Viewing:
-                if (!tapDisabled)
-                    onDocMotion();
+    @Override
+    public boolean onScroll(final MotionEvent e1, final MotionEvent e2, final float distanceX, final float distanceY) {
+        final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
+        switch (this.mMode) {
+            case Viewing: {
+                if (!this.tapDisabled) {
+                    this.onDocMotion();
+                }
                 return super.onScroll(e1, e2, distanceX, distanceY);
-            case Selecting:
-                if (pageView != null)
+            }
+            case Selecting: {
+                if (pageView != null) {
                     pageView.selectText(e1.getX(), e1.getY(), e2.getX(), e2.getY());
+                }
                 return true;
-            default:
+            }
+            default: {
                 return true;
+            }
         }
     }
 
     @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                           float velocityY) {
-        switch (mMode) {
-            case Viewing:
+    public boolean onFling(final MotionEvent e1, final MotionEvent e2, final float velocityX, final float velocityY) {
+        switch (this.mMode) {
+            case Viewing: {
                 return super.onFling(e1, e2, velocityX, velocityY);
-            default:
+            }
+            default: {
                 return true;
+            }
         }
+    }
+
+    @Override
+    public boolean onScaleBegin(final ScaleGestureDetector d) {
+        this.tapDisabled = true;
+        return super.onScaleBegin(d);
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
         super.onLongPress(e);
-      //  MuPDFView pageView = (MuPDFView) getDisplayedView();
+        //  MuPDFView pageView = (MuPDFView) getDisplayedView();
         switch (mMode) {
             case Viewing:
                 onLongPress();
             default:
-
         }
-
-
-
-
     }
 
-    public boolean onScaleBegin(ScaleGestureDetector d) {
-        // Disabled showing the buttons until next touch.
-        // Not sure why this is needed, but without it
-        // pinch zoom can make the buttons appear
-        tapDisabled = true;
-        return super.onScaleBegin(d);
-    }
-    float initialY;
-    float startYPoint;
-    String moveDirection = "";
-    public boolean onTouchEvent(MotionEvent event) {
-
-        if (mMode == MuPDFReaderView.Mode.Drawing) {
-            float x = event.getX();
-            float y = event.getY();
+    @Override
+    public boolean onTouchEvent(final MotionEvent event) {
+//        if (this.mMode == Mode.Drawing || this.mMode == Mode.Selecting) {
+        if (this.mMode == Mode.Selecting) {
+            final float x = event.getX();
+            final float y = event.getY();
             switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    touch_start(x, y);
+                case MotionEvent.ACTION_DOWN: {
+                    if (this.mMode == Mode.Drawing) {
+                        this.touch_start(x, y);
+                    }
                     break;
-                case MotionEvent.ACTION_MOVE:
-                    touch_move(x, y);
+                }
+                case MotionEvent.ACTION_MOVE: {
+                    if (this.mMode == Mode.Drawing) {
+                        this.touch_move(x, y);
+                    }
                     break;
+                }
+
                 case MotionEvent.ACTION_UP:
-                    //added by me not tested may b cause problem
-//                    Log.d("DSID", "undoDraw ----ACTION_UP Called");
-                  /*
-                  currently giving crash here
-                  MuPDFPageView pageView = null;
-                    if(pageView.path!=null){
-                        Log.d("DSID", "onDraw ACTION_UP:I am here called ");
-                        pageView.addPathToHistory(pageView.path);
-                        pageView.path = null;
-                    }*/
-                    // invalidate();
+                    if (this.mMode == Mode.Selecting) {
+                        final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
+                        pageView.isTextSelected();
+                        touch_up(x, y);
+                    }
                     break;
             }
         }
-        if (mMode == Mode.Selecting  ) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    x = event.getX();
-                    y = event.getY();
-                    actionDSelection();
-                    showCopyBtn(-1f, -1f,-1f,false);
-                    initialY = y;
-                    //Log.i("TETXTTOUCH", "onTouchEvent: ACTION_DOWN");
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    //  Log.i("TETXTTOUCH", "onTouchEvent: ACTION_MOVE");
-                    float deltaY = event.getY() - initialY;
-                    if (deltaY > 0) {
-                        // User moved from top to bottom
-                        moveDirection = "UP";
-                        Log.i("TETXTTOUCH", "onTouchEvent: Moved from TOP to BOTTOM");
-                    } else if (deltaY < 0) {
-                        // User moved from bottom to top
-                        moveDirection = "DOWN";
-                        Log.i("TETXTTOUCH", "onTouchEvent: Moved from BOTTOM to TOP");
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                   if(moveDirection.equals("DOWN")) {
-                       currentY = event.getY();
-                   }else{
-                       currentY = -1f;
-                   }
-                    MuPDFView pageView1 = (MuPDFView) getDisplayedView();
-                    if (pageView1 != null) {
-                        pageView1.isTextSelected();
-                        showCopyBtn(x, y,currentY,true);
-                    }
-
-                    Log.i("TETXTTOUCH", "onTouchEvent: ACTION_UP");
-                    break;
-            }
+        if ((event.getAction() & event.getActionMasked()) == 0x0) {
+            this.tapDisabled = false;
         }
-
-        if ((event.getAction() & event.getActionMasked()) == MotionEvent.ACTION_DOWN) {
-            tapDisabled = false;
-        }
-
         return super.onTouchEvent(event);
     }
 
-    private void actionDSelection() {
-        MuPDFView pageView = (MuPDFView) getDisplayedView();
-        if (pageView != null) {
-            pageView.deselectText();
-        }
-    }
 
-
-    String action ="";
-    float currentY =-1f;
-    float x = 0f;
-    float y = 0f;
-
-    private float mX, mY;
-    private float cX, cY;
-
-    private static final float TOUCH_TOLERANCE = 2;
-
-    private void touch_start(float x, float y) {
-
-        MuPDFView pageView = (MuPDFView) getDisplayedView();
+    private void touch_start(final float x, final float y) {
+        final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
         if (pageView != null) {
             pageView.startDraw(x, y);
         }
-        mX = x;
-        mY = y;
+        this.mX = x;
+        this.mY = y;
     }
 
-    private void showCopyBtn(float x, float y, Float direction, Boolean actionDetect) {
-        MuPDFView pageView = (MuPDFView) getDisplayedView();
-        if (pageView != null) {
-            pageView.showCopyRect(x, y,direction,pageView.isTextSelected(),actionDetect);
-        }
-//        cX = x;
-//        cY = y;
-    }
-
-
-    private void touch_move(float x, float y) {
-        float dx = Math.abs(x - mX);
-        float dy = Math.abs(y - mY);
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            MuPDFView pageView = (MuPDFView) getDisplayedView();
+    private void touch_move(final float x, final float y) {
+        final float dx = Math.abs(x - this.mX);
+        final float dy = Math.abs(y - this.mY);
+        if (dx >= 2.0f || dy >= 2.0f) {
+            final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
             if (pageView != null) {
                 pageView.continueDraw(x, y);
             }
-            mX = x;
-            mY = y;
+            this.mX = x;
+            this.mY = y;
         }
     }
 
-    protected void onChildSetup(int i, View v) {
+    private void touch_up(final float x, final float y) {
+        final float dx = Math.abs(x - this.mX);
+        final float dy = Math.abs(y - this.mY);
+        if (dx >= 2.0f || dy >= 2.0f) {
+            final MuPDFView pageView = (MuPDFView) this.getDisplayedView();
+            if (pageView != null) {
+                pageView.showCopyRect(x, y);
+            }
+            this.mX = x;
+            this.mY = y;
+        }
+    }
+
+    @Override
+    protected void onChildSetup(final int i, final View v) {
         if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber == i) {
             ((MuPDFView) v).setSearchBoxes(SearchTaskResult.get().searchBoxes);
         } else {
             ((MuPDFView) v).setSearchBoxes(null);
         }
-
-        ((MuPDFView) v).setLinkHighlighting(mLinksEnabled);
-
-        // Set hyperlink color
-        if (isLinkHighlightColor) {
-            ((MuPDFView) v).setLinkHighlightColor(mLinkHighlightColor);
+        ((MuPDFView) v).setLinkHighlighting(this.mLinksEnabled);
+        if (this.isLinkHighlightColor) {
+            ((MuPDFView) v).setLinkHighlightColor(this.mLinkHighlightColor);
         }
-
         ((MuPDFView) v).setChangeReporter(new Runnable() {
+            @Override
             public void run() {
-                applyToChildren(new ReaderView.ViewMapper() {
+                MuPDFReaderView.this.applyToChildren(new ViewMapper() {
                     @Override
-                    public void applyToView(View view) {
+                    public void applyToView(final View view) {
                         ((MuPDFView) view).update();
                     }
                 });
@@ -438,86 +311,78 @@ public class MuPDFReaderView extends ReaderView {
         });
     }
 
-    protected void onMoveToChild(int i) {
-        if (SearchTaskResult.get() != null
-                && SearchTaskResult.get().pageNumber != i) {
+    @Override
+    protected void onMoveToChild(final int i) {
+        if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber != i) {
             SearchTaskResult.set(null);
-            resetupChildren();
+            this.resetupChildren();
         }
-        checkMuPDFReaderViewListener();
-        listener.onMoveToChild(i);
+        this.checkMuPDFReaderViewListener();
+        this.listener.onMoveToChild(i);
     }
 
     @Override
-    protected void onMoveOffChild(int i) {
-        View v = getView(i);
-        if (v != null)
+    protected void onMoveOffChild(final int i) {
+        final View v = this.getView(i);
+        if (v != null) {
             ((MuPDFView) v).deselectAnnotation();
+        }
     }
 
-    protected void onSettle(View v) {
-        // When the layout has settled ask the page to render
-        // in HQ
+    @Override
+    protected void onSettle(final View v) {
         ((MuPDFView) v).updateHq(false);
     }
 
-    protected void onUnsettle(View v) {
-        // When something changes making the previous settled view
-        // no longer appropriate, tell the page to remove HQ
+    @Override
+    protected void onUnsettle(final View v) {
         ((MuPDFView) v).removeHq();
     }
 
     @Override
-    protected void onNotInUse(View v) {
+    protected void onNotInUse(final View v) {
         ((MuPDFView) v).releaseResources();
     }
 
     @Override
-    protected void onScaleChild(View v, Float scale) {
+    protected void onScaleChild(final View v, final Float scale) {
         ((MuPDFView) v).setScale(scale);
     }
 
-    /**
-     * Set up listening events
-     *
-     * @param listener
-     */
-    public void setListener(MuPDFReaderViewListener listener) {
+    public void setListener(final MuPDFReaderViewListener listener) {
         this.listener = listener;
     }
 
     private void checkMuPDFReaderViewListener() {
-        if (listener == null) {
-            listener = new MuPDFReaderViewListener() {
+        if (this.listener == null) {
+            this.listener = new MuPDFReaderViewListener() {
                 @Override
-                public void onMoveToChild(int i) {
-
+                public void onMoveToChild(final int i) {
                 }
 
                 @Override
                 public void onTapMainDocArea() {
-
                 }
 
                 @Override
                 public void onDocMotion() {
-
                 }
 
                 @Override
-                public void onHit(Hit item) {
-
+                public void onHit(final Hit item) {
                 }
 
                 @Override
                 public void onLongPress() {
-                    Log.i("LONGPRESS", "onLongPress: hitting Long press READERVIEW");
 
                 }
-
-
             };
         }
     }
-}
 
+    public enum Mode {
+        Viewing,
+        Selecting,
+        Drawing;
+    }
+}

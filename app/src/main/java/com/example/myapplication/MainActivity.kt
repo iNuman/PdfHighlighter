@@ -19,15 +19,10 @@ class MainActivity : AppCompatActivity() {
 //        copyFileFromAssetsToInternal(this, "example.pdf")
         copyFileFromAssetsToInternal(this, "Android.pdf")
         startActivity(Intent(this@MainActivity, ViewEditPdfActivity::class.java).apply {
-        //"/data/user/0/com.example.myapplication/files/example.pdf"
             putExtra(Constants.PDF_FILE_PATH, "${filesDir.path}/Android.pdf")
-//            putExtra(Constants.PDF_FILE_PATH, "${filesDir.path}/example.pdf")
-//            putExtra(Constants.PDF_FILE_PATH, "https://www.clickdimensions.com/links/TestPDFfile.pdf")
             putExtra(Constants.DOC_ID, -1L)
             putExtra(Constants.DIRECT_DOC_EDIT_OPEN, false)
-//            putParcelableArrayListExtra(DATA_CLASS_BUNDLE)
             putExtra(Constants.DOC_NAME, "Android.pdf")
-//            putExtra(Constants.DOC_NAME, "example.pdf")
         })
     }
 

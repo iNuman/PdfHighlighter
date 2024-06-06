@@ -15,6 +15,8 @@
  */
 package com.artifex.mupdfdemo;
 
+import android.view.View;
+
 /**
  * Implements this interface to receive events from PDFView
  * when a page has changed through swipe
@@ -27,5 +29,6 @@ public interface OnPageChangeListener {
      * @param page      the new page displayed, starting from 0
      */
     void onPageChanged(int page);
+    void onPageChanged(int page, View currentPageView);
 
 }

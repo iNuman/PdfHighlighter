@@ -174,34 +174,8 @@ import kotlin.toString
 //        Log.i("error", "Successfully completed")
 //    }.flowOn(Dispatchers.IO)
 
-fun View.showIfNotVisible() {
-    if (visibility != View.VISIBLE) {
-        visibility = View.VISIBLE
-    }
-}
 
-fun View.hideIfVisible() {
-    if (isVisible) {
-        visibility = View.GONE
-    }
-}
 
-enum class TopBarMode {
-    Main, Search, Annot, Delete, Accept
-
-}
-
-enum class AcceptMode {
-    Highlight, Underline, StrikeOut, Ink, CopyText
-}
-
-fun View.hide() {
-    this.visibility = View.GONE
-}
-
-fun View.show() {
-    this.visibility = View.VISIBLE
-}
 
 
 class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
@@ -557,7 +531,7 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
                         it.setBackgroundColor(currentBgColor)
                         //  it.setBackgroundColor(ContextCompat.getColor(this, R.color.black))
                         getPageViewMupdf()?.let { pageView ->
-                            pageView.setPageMode("DARK")
+//                            pageView.setPageMode("DARK")
                             //pageView.setPageMode(true)
                             update3PagesMode()
                             currentTheme = DARK
@@ -577,7 +551,7 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
                         muPdf.setBackgroundColor(currentBgColor)
                         getPageViewMupdf()?.let { pageView ->
                             //pageView.setPageMode(false)
-                            pageView.setPageMode("LIGHT")
+//                            pageView.setPageMode("LIGHT")
                             update3PagesMode()
                             currentTheme = LIGHT
                         }
@@ -594,7 +568,7 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
                         muPdf.setBackgroundColor(currentBgColor)
                         getPageViewMupdf()?.let { pageView ->
                             //pageView.setPageMode(false)
-                            pageView.setPageMode("EYES")
+//                            pageView.setPageMode("EYES")
                             update3PagesMode()
                             currentTheme = EYES
                         }
@@ -604,7 +578,7 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
                 CONTINUE_MODE -> {
                     getPageViewMupdf()?.let { pageView ->
                         sideSeekHandling()
-                        pageView.setContinuousPageScroll(true)
+//                        pageView.setContinuousPageScroll(true)
                         currentPageMode = CONTINUE_MODE
                     }
                 }
@@ -612,7 +586,7 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
                 PAGE_MODE -> {
                     getPageViewMupdf()?.let { pageView ->
                         sideSeekHandling()
-                        pageView.setContinuousPageScroll(false)
+//                        pageView.setContinuousPageScroll(false)
                         currentPageMode = PAGE_MODE
                     }
                 }
@@ -734,17 +708,17 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
             selectAndCopyText()
             getPageViewMupdf()?.let { pageView ->
                 var visible = false
-                onClick = { x, y, currentY, action, bolean ->
-                    visible = bolean
+                onClick = { x, y, rectF ->
+//                    visible = bolean
                     if (mAcceptMode == AcceptMode.CopyText) {
                         Log.i("TETXTTOUCH", "showCopyRect: yes I'm in PageView with $x $y")
-                        if (action) {
-                            copyButtonOnScreen(x, y, currentY)
+//                        if (action) {
+                            copyButtonOnScreen(x, y, y)
                             hideShowSecondCopyBtn(visible)
                         } else {
                             hideShowSecondCopyBtn(false)
                         }
-                    }
+//                    }
                 }
                 Log.i("TETXTTOUCH", "hideShowSecondCopyBtn: BEFORE")
             }
@@ -789,14 +763,14 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
         toolsLayout.undoDrawButton.setOnSingleClickListener({
             // val pageView = muPDFReaderViewN?.displayedView as MuPDFView
             getPageViewMupdf()?.let { pageView ->
-                pageView.undoDraw()
+//                pageView.undoDraw()
             }
         })
 
         toolsLayout.redoDrawButton.setOnSingleClickListener({
             // val pageView = muPDFReaderViewN?.displayedView as MuPDFView
             getPageViewMupdf()?.let { pageView ->
-                pageView.redoDraw()
+//                pageView.redoDraw()
 
             }
         })
@@ -1732,6 +1706,10 @@ class ViewEditPdfActivity : AppCompatActivity(), OnPageChangeListener {
         setSeekProgressWhenChange(page + 1)
 
 
+    }
+
+    override fun onPageChanged(page: Int, currentPageView: View?) {
+        TODO("Not yet implemented")
     }
 
     private fun setSeekProgressWhenChange(index: Int) {

@@ -3,10 +3,10 @@
         <item name="android:windowBackground">@drawable/tiled_background</item>
    </style>
 
-    <style name="StyleBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
-    </style>
-    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@drawable/round_corner_outline</item>
-    </style>
+<!--    <style name="StyleBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">-->
+<!--        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>-->
+<!--    </style>-->
+<!--    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">-->
+<!--        <item name="android:background">@drawable/round_corner_outline</item>-->
+<!--    </style>-->
 </resources>

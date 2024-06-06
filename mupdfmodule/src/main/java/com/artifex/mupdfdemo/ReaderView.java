@@ -1,59 +1,55 @@
+//
+// Decompiled by Procyon v0.5.36
+//
+
 package com.artifex.mupdfdemo;
 
-import static com.artifex.mupdfdemo.PageView.continueScrolling;
+import java.util.NoSuchElementException;
+import android.view.ViewGroup;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Point;
+import android.content.DialogInterface;
+import android.app.AlertDialog;
 import android.graphics.Rect;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.util.SparseArray;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
+import android.util.AttributeSet;
+import android.content.Context;
+import android.widget.Scroller;
+import java.util.LinkedList;
 import android.view.View;
+import android.util.SparseArray;
+import android.view.ScaleGestureDetector;
+import android.view.GestureDetector;
 import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.Scroller;
 
+//import com.lonelypluto.pdfviewerdemo.R;
 
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-
-public class ReaderView extends AdapterView<Adapter>
-        implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener, Runnable {
+public class ReaderView extends AdapterView<Adapter> implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener, Runnable
+{
     private static final int MOVING_DIAGONALLY = 0;
     private static final int MOVING_LEFT = 1;
     private static final int MOVING_RIGHT = 2;
     private static final int MOVING_UP = 3;
     private static final int MOVING_DOWN = 4;
-
     private static final int FLING_MARGIN = 100;
     private static final int GAP = 20;
-
     private static final float MIN_SCALE = 1.0f;
-   // private static final float MAX_SCALE = 10.0f;
     private static final float MAX_SCALE = 5.0f;
     private static final float REFLOW_SCALE_FACTOR = 0.5f;
-
-    private boolean HORIZONTAL_SCROLLING =false;// horizontal and  vertical scroll
-
+    private boolean HORIZONTAL_SCROLLING;
     private Adapter mAdapter;
-    private int mCurrent;// Adapter's index for the current view
+    private int mCurrent;
     private boolean mResetLayout;
-    private final SparseArray<View> mChildViews = new SparseArray<View>(3);
-    // Shadows the children of the adapter view
-    // but with more sensible indexing
-    private final LinkedList<View> mViewCache = new LinkedList<View>();
-    private boolean mUserInteracting;// Whether the user is interacting
-    private boolean mScaling;// Whether the user is currently pinch zooming
-    private float mScale = 1.0f;
-    private int mXScroll;// Scroll amounts recorded from events.
-    private int mYScroll;// and then accounted for in onLayout
-    private boolean mReflow = false;
-    private boolean mReflowChanged = false;
+    private final SparseArray<View> mChildViews;
+    private final LinkedList<View> mViewCache;
+    private boolean mUserInteracting;
+    private boolean mScaling;
+    private float mScale;
+    private int mXScroll;
+    private int mYScroll;
+    private boolean mReflow;
+    private boolean mReflowChanged;
     private final GestureDetector mGestureDetector;
     private final ScaleGestureDetector mScaleGestureDetector;
     private final Scroller mScroller;
@@ -63,967 +59,785 @@ public class ReaderView extends AdapterView<Adapter>
     private float mLastScaleFocusX;
     private float mLastScaleFocusY;
     private Context mContext;
+    private boolean memAlert;
 
-    public static abstract class ViewMapper {
-        public abstract void applyToView(View view);
-    }
-
-    public ReaderView(Context context) {
+    public ReaderView(final Context context) {
         super(context);
-        mGestureDetector = new GestureDetector(this);
-        mScaleGestureDetector = new ScaleGestureDetector(context, this);
-        mScroller = new Scroller(context);
-        mStepper = new Stepper(this, this);
-        mContext = context;
+        this.HORIZONTAL_SCROLLING = true;
+        this.mChildViews = (SparseArray<View>)new SparseArray(3);
+        this.mViewCache = new LinkedList<View>();
+        this.mScale = 1.0f;
+        this.mReflow = false;
+        this.mReflowChanged = false;
+        this.memAlert = false;
+        this.mGestureDetector = new GestureDetector((GestureDetector.OnGestureListener)this);
+        this.mScaleGestureDetector = new ScaleGestureDetector(context, (ScaleGestureDetector.OnScaleGestureListener)this);
+        this.mScroller = new Scroller(context);
+        this.mStepper = new Stepper((View)this, this);
+        this.mContext = context;
     }
 
-    public ReaderView(Context context, AttributeSet attrs) {
+    public ReaderView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
-
-        // "Edit mode" means when the View is being displayed in the Android GUI editor. (this class
-        // is instantiated in the IDE, so we need to be a bit careful what we do).
-        if (isInEditMode()) {
-            mGestureDetector = null;
-            mScaleGestureDetector = null;
-            mScroller = null;
-            mStepper = null;
-        } else {
-            mGestureDetector = new GestureDetector(this);
-            mScaleGestureDetector = new ScaleGestureDetector(context, this);
-            mScroller = new Scroller(context);
-            mStepper = new Stepper(this, this);
+        this.HORIZONTAL_SCROLLING = true;
+        this.mChildViews = (SparseArray<View>)new SparseArray(3);
+        this.mViewCache = new LinkedList<View>();
+        this.mScale = 1.0f;
+        this.mReflow = false;
+        this.mReflowChanged = false;
+        this.memAlert = false;
+        if (this.isInEditMode()) {
+            this.mGestureDetector = null;
+            this.mScaleGestureDetector = null;
+            this.mScroller = null;
+            this.mStepper = null;
         }
-        mContext = context;
+        else {
+            this.mGestureDetector = new GestureDetector((GestureDetector.OnGestureListener)this);
+            this.mScaleGestureDetector = new ScaleGestureDetector(context, (ScaleGestureDetector.OnScaleGestureListener)this);
+            this.mScroller = new Scroller(context);
+            this.mStepper = new Stepper((View)this, this);
+        }
+        this.mContext = context;
     }
 
-    public ReaderView(Context context, AttributeSet attrs, int defStyle) {
+    public ReaderView(final Context context, final AttributeSet attrs, final int defStyle) {
         super(context, attrs, defStyle);
-        mGestureDetector = new GestureDetector(this);
-        mScaleGestureDetector = new ScaleGestureDetector(context, this);
-        mScroller = new Scroller(context);
-        mStepper = new Stepper(this, this);
-        mContext = context;
+        this.HORIZONTAL_SCROLLING = true;
+        this.mChildViews = (SparseArray<View>)new SparseArray(3);
+        this.mViewCache = new LinkedList<View>();
+        this.mScale = 1.0f;
+        this.mReflow = false;
+        this.mReflowChanged = false;
+        this.memAlert = false;
+        this.mGestureDetector = new GestureDetector((GestureDetector.OnGestureListener)this);
+        this.mScaleGestureDetector = new ScaleGestureDetector(context, (ScaleGestureDetector.OnScaleGestureListener)this);
+        this.mScroller = new Scroller(context);
+        this.mStepper = new Stepper((View)this, this);
+        this.mContext = context;
     }
-
-
 
     public int getDisplayedViewIndex() {
-        return mCurrent;
+        return this.mCurrent;
     }
 
-    public void setDisplayedViewIndex(int i) {
-        if (0 <= i && i < mAdapter.getCount()) {
-            onMoveOffChild(mCurrent);
-            mCurrent = i;
-            onMoveToChild(i);
-            mResetLayout = true;
-            requestLayout();
+    public void setDisplayedViewIndex(final int i) {
+        if (0 <= i && i < this.mAdapter.getCount()) {
+            this.onMoveOffChild(this.mCurrent);
+            this.onMoveToChild(this.mCurrent = i);
+            this.mResetLayout = true;
+            this.requestLayout();
         }
     }
 
-    /**
-     * 设置横向或竖向滑动
-     * @param HORIZONTAL_SCROLLING 是否横向滑动 true：横向, false：纵向
-     */
-    public void setHorizontalScrolling(boolean HORIZONTAL_SCROLLING) {
+    public void setHorizontalScrolling(final boolean HORIZONTAL_SCROLLING) {
         this.HORIZONTAL_SCROLLING = HORIZONTAL_SCROLLING;
     }
 
-
-
     public void moveToNext() {
-        View v = mChildViews.get(mCurrent + 1);
-        if (v != null)
-            slideViewOntoScreen(v);
+        final View v = (View)this.mChildViews.get(this.mCurrent + 1);
+        if (v != null) {
+            this.slideViewOntoScreen(v);
+        }
     }
 
     public void moveToPrevious() {
-        View v = mChildViews.get(mCurrent - 1);
-        if (v != null)
-            slideViewOntoScreen(v);
+        final View v = (View)this.mChildViews.get(this.mCurrent - 1);
+        if (v != null) {
+            this.slideViewOntoScreen(v);
+        }
     }
 
-    // When advancing down the page, we want to advance by about
-    // 90% of a screenful. But we'd be happy to advance by between
-    // 80% and 95% if it means we hit the bottom in a whole number
-    // of steps.
-    private int smartAdvanceAmount(int screenHeight, int max) {
-        int advance = (int) (screenHeight * 0.9 + 0.5);
-        int leftOver = max % advance;
-        int steps = max / advance;
-        if (leftOver == 0) {
-            // We'll make it exactly. No adjustment
-        } else if ((float) leftOver / steps <= screenHeight * 0.05) {
-            // We can adjust up by less than 5% to make it exact.
-            advance += (int) ((float) leftOver / steps + 0.5);
-        } else {
-            int overshoot = advance - leftOver;
-            if ((float) overshoot / steps <= screenHeight * 0.1) {
-                // We can adjust down by less than 10% to make it exact.
-                advance -= (int) ((float) overshoot / steps + 0.5);
+    private int smartAdvanceAmount(final int screenHeight, final int max) {
+        int advance = (int)(screenHeight * 0.9 + 0.5);
+        final int leftOver = max % advance;
+        final int steps = max / advance;
+        if (leftOver != 0) {
+            if (leftOver / (float)steps <= screenHeight * 0.05) {
+                advance += (int)(leftOver / (float)steps + 0.5);
+            }
+            else {
+                final int overshoot = advance - leftOver;
+                if (overshoot / (float)steps <= screenHeight * 0.1) {
+                    advance -= (int)(overshoot / (float)steps + 0.5);
+                }
             }
         }
-        if (advance > max)
+        if (advance > max) {
             advance = max;
+        }
         return advance;
     }
 
     public void smartMoveForwards() {
-        View v = mChildViews.get(mCurrent);
-        if (v == null)
+        final View v = (View)this.mChildViews.get(this.mCurrent);
+        if (v == null) {
             return;
-
-        // The following code works in terms of where the screen is on the views;
-        // so for example, if the currentView is at (-100,-100), the visible
-        // region would be at (100,100). If the previous page was (2000, 3000) in
-        // size, the visible region of the previous page might be (2100 + GAP, 100)
-        // (i.e. off the previous page). This is different to the way the rest of
-        // the code in this file is written, but it's easier for me to think about.
-        // At some point we may refactor this to fit better with the rest of the
-        // code.
-
-        // screenWidth/Height are the actual width/height of the screen. e.g. 480/800
-        int screenWidth = getWidth();
-        int screenHeight = getHeight();
-        // We might be mid scroll; we want to calculate where we scroll to based on
-        // where this scroll would end, not where we are now (to allow for people
-        // bashing 'forwards' very fast.
-        int remainingX = mScroller.getFinalX() - mScroller.getCurrX();
-        int remainingY = mScroller.getFinalY() - mScroller.getCurrY();
-        // right/bottom is in terms of pixels within the scaled document; e.g. 1000
-        int top = -(v.getTop() + mYScroll + remainingY);
-        int right = screenWidth - (v.getLeft() + mXScroll + remainingX);
-        int bottom = screenHeight + top;
-        // docWidth/Height are the width/height of the scaled document e.g. 2000x3000
-        int docWidth = v.getMeasuredWidth();
-        int docHeight = v.getMeasuredHeight();
-
-        int xOffset, yOffset;
+        }
+        final int screenWidth = this.getWidth();
+        final int screenHeight = this.getHeight();
+        final int remainingX = this.mScroller.getFinalX() - this.mScroller.getCurrX();
+        final int remainingY = this.mScroller.getFinalY() - this.mScroller.getCurrY();
+        final int top = -(v.getTop() + this.mYScroll + remainingY);
+        final int right = screenWidth - (v.getLeft() + this.mXScroll + remainingX);
+        final int bottom = screenHeight + top;
+        final int docWidth = v.getMeasuredWidth();
+        final int docHeight = v.getMeasuredHeight();
+        int yOffset;
+        int xOffset;
         if (bottom >= docHeight) {
-            // We are flush with the bottom. Advance to next column.
             if (right + screenWidth > docWidth) {
-                // No room for another column - go to next page
-                View nv = mChildViews.get(mCurrent + 1);
-                if (nv == null) // No page to advance to
+                final View nv = (View)this.mChildViews.get(this.mCurrent + 1);
+                if (nv == null) {
                     return;
-                int nextTop = -(nv.getTop() + mYScroll + remainingY);
-                int nextLeft = -(nv.getLeft() + mXScroll + remainingX);
-                int nextDocWidth = nv.getMeasuredWidth();
-                int nextDocHeight = nv.getMeasuredHeight();
-
-                // Allow for the next page maybe being shorter than the screen is high
-                yOffset = (nextDocHeight < screenHeight ? ((nextDocHeight - screenHeight) >> 1) : 0);
-
+                }
+                final int nextTop = -(nv.getTop() + this.mYScroll + remainingY);
+                final int nextLeft = -(nv.getLeft() + this.mXScroll + remainingX);
+                final int nextDocWidth = nv.getMeasuredWidth();
+                final int nextDocHeight = nv.getMeasuredHeight();
+                yOffset = ((nextDocHeight < screenHeight) ? (nextDocHeight - screenHeight >> 1) : 0);
                 if (nextDocWidth < screenWidth) {
-                    // Next page is too narrow to fill the screen. Scroll to the top, centred.
-                    xOffset = (nextDocWidth - screenWidth) >> 1;
-                } else {
-                    // Reset X back to the left hand column
+                    xOffset = nextDocWidth - screenWidth >> 1;
+                }
+                else {
                     xOffset = right % screenWidth;
-                    // Adjust in case the previous page is less wide
-                    if (xOffset + screenWidth > nextDocWidth)
+                    if (xOffset + screenWidth > nextDocWidth) {
                         xOffset = nextDocWidth - screenWidth;
+                    }
                 }
                 xOffset -= nextLeft;
                 yOffset -= nextTop;
-            } else {
-                // Move to top of next column
+            }
+            else {
                 xOffset = screenWidth;
                 yOffset = screenHeight - bottom;
             }
-        } else {
-            // Advance by 90% of the screen height downwards (in case lines are partially cut off)
-            xOffset = 0;
-            yOffset = smartAdvanceAmount(screenHeight, docHeight - bottom);
         }
-        mScrollerLastX = mScrollerLastY = 0;
-      //  mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
-        mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
-        mStepper.prod();
+        else {
+            xOffset = 0;
+            yOffset = this.smartAdvanceAmount(screenHeight, docHeight - bottom);
+        }
+        final int n = 0;
+        this.mScrollerLastY = n;
+        this.mScrollerLastX = n;
+        this.mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
+        this.mStepper.prod();
     }
 
     public void smartMoveBackwards() {
-        View v = mChildViews.get(mCurrent);
-        if (v == null)
+        final View v = (View)this.mChildViews.get(this.mCurrent);
+        if (v == null) {
             return;
-
-        // The following code works in terms of where the screen is on the views;
-        // so for example, if the currentView is at (-100,-100), the visible
-        // region would be at (100,100). If the previous page was (2000, 3000) in
-        // size, the visible region of the previous page might be (2100 + GAP, 100)
-        // (i.e. off the previous page). This is different to the way the rest of
-        // the code in this file is written, but it's easier for me to think about.
-        // At some point we may refactor this to fit better with the rest of the
-        // code.
-
-        // screenWidth/Height are the actual width/height of the screen. e.g. 480/800
-        int screenWidth = getWidth();
-        int screenHeight = getHeight();
-        // We might be mid scroll; we want to calculate where we scroll to based on
-        // where this scroll would end, not where we are now (to allow for people
-        // bashing 'forwards' very fast.
-        int remainingX = mScroller.getFinalX() - mScroller.getCurrX();
-        int remainingY = mScroller.getFinalY() - mScroller.getCurrY();
-        // left/top is in terms of pixels within the scaled document; e.g. 1000
-        int left = -(v.getLeft() + mXScroll + remainingX);
-        int top = -(v.getTop() + mYScroll + remainingY);
-        // docWidth/Height are the width/height of the scaled document e.g. 2000x3000
-        int docHeight = v.getMeasuredHeight();
-
-        int xOffset, yOffset;
+        }
+        final int screenWidth = this.getWidth();
+        final int screenHeight = this.getHeight();
+        final int remainingX = this.mScroller.getFinalX() - this.mScroller.getCurrX();
+        final int remainingY = this.mScroller.getFinalY() - this.mScroller.getCurrY();
+        final int left = -(v.getLeft() + this.mXScroll + remainingX);
+        final int top = -(v.getTop() + this.mYScroll + remainingY);
+        final int docHeight = v.getMeasuredHeight();
+        int yOffset;
+        int xOffset;
         if (top <= 0) {
-            // We are flush with the top. Step back to previous column.
             if (left < screenWidth) {
-                /* No room for previous column - go to previous page */
-                View pv = mChildViews.get(mCurrent - 1);
-                if (pv == null) /* No page to advance to */
+                final View pv = (View)this.mChildViews.get(this.mCurrent - 1);
+                if (pv == null) {
                     return;
-                int prevDocWidth = pv.getMeasuredWidth();
-                int prevDocHeight = pv.getMeasuredHeight();
-
-                // Allow for the next page maybe being shorter than the screen is high
-                yOffset = (prevDocHeight < screenHeight ? ((prevDocHeight - screenHeight) >> 1) : 0);
-
-                int prevLeft = -(pv.getLeft() + mXScroll);
-                int prevTop = -(pv.getTop() + mYScroll);
+                }
+                final int prevDocWidth = pv.getMeasuredWidth();
+                final int prevDocHeight = pv.getMeasuredHeight();
+                yOffset = ((prevDocHeight < screenHeight) ? (prevDocHeight - screenHeight >> 1) : 0);
+                final int prevLeft = -(pv.getLeft() + this.mXScroll);
+                final int prevTop = -(pv.getTop() + this.mYScroll);
                 if (prevDocWidth < screenWidth) {
-                    // Previous page is too narrow to fill the screen. Scroll to the bottom, centred.
-                    xOffset = (prevDocWidth - screenWidth) >> 1;
-                } else {
-                    // Reset X back to the right hand column
-                    xOffset = (left > 0 ? left % screenWidth : 0);
-                    if (xOffset + screenWidth > prevDocWidth)
+                    xOffset = prevDocWidth - screenWidth >> 1;
+                }
+                else {
+                    xOffset = ((left > 0) ? (left % screenWidth) : 0);
+                    if (xOffset + screenWidth > prevDocWidth) {
                         xOffset = prevDocWidth - screenWidth;
-                    while (xOffset + screenWidth * 2 < prevDocWidth)
+                    }
+                    while (xOffset + screenWidth * 2 < prevDocWidth) {
                         xOffset += screenWidth;
+                    }
                 }
                 xOffset -= prevLeft;
                 yOffset -= prevTop - prevDocHeight + screenHeight;
-            } else {
-                // Move to bottom of previous column
+            }
+            else {
                 xOffset = -screenWidth;
                 yOffset = docHeight - screenHeight + top;
             }
-        } else {
-            // Retreat by 90% of the screen height downwards (in case lines are partially cut off)
-            xOffset = 0;
-            yOffset = -smartAdvanceAmount(screenHeight, top);
         }
-        mScrollerLastX = mScrollerLastY = 0;
-        mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
-        mStepper.prod();
+        else {
+            xOffset = 0;
+            yOffset = -this.smartAdvanceAmount(screenHeight, top);
+        }
+        final int n = 0;
+        this.mScrollerLastY = n;
+        this.mScrollerLastX = n;
+        this.mScroller.startScroll(0, 0, remainingX - xOffset, remainingY - yOffset, 400);
+        this.mStepper.prod();
     }
 
     public void resetupChildren() {
-        for (int i = 0; i < mChildViews.size(); i++)
-            onChildSetup(mChildViews.keyAt(i), mChildViews.valueAt(i));
+        for (int i = 0; i < this.mChildViews.size(); ++i) {
+            this.onChildSetup(this.mChildViews.keyAt(i), (View)this.mChildViews.valueAt(i));
+        }
     }
 
     public View getCurrentView() {
-        return mChildViews.get(mCurrent);
+        return (View)this.mChildViews.get(this.mCurrent);
     }
 
-    public void applyToChildren(ViewMapper mapper) {
-        for (int i = 0; i < mChildViews.size(); i++)
-            mapper.applyToView(mChildViews.valueAt(i));
+    public void applyToChildren(final ViewMapper mapper) {
+        for (int i = 0; i < this.mChildViews.size(); ++i) {
+            mapper.applyToView((View)this.mChildViews.valueAt(i));
+        }
     }
 
-    public void refresh(boolean reflow) {
-        mReflow = reflow;
-        mReflowChanged = true;
-        mResetLayout = true;
-
-        mScale = 1.0f;
-        mXScroll = mYScroll = 0;
-
-        requestLayout();
+    public void refresh(final boolean reflow) {
+        this.mReflow = reflow;
+        this.mReflowChanged = true;
+        this.mResetLayout = true;
+        this.mScale = 1.0f;
+        final int n = 0;
+        this.mYScroll = n;
+        this.mXScroll = n;
+        this.requestLayout();
     }
 
-    protected void onChildSetup(int i, View v) {
+    protected void onChildSetup(final int i, final View v) {
     }
 
-    protected void onMoveToChild(int i) {
+    protected void onMoveToChild(final int i) {
     }
 
-    protected void onMoveOffChild(int i) {
+    protected void onMoveOffChild(final int i) {
     }
 
-    protected void onSettle(View v) {
+    protected void onSettle(final View v) {
     }
 
-    protected void onUnsettle(View v) {
+    protected void onUnsettle(final View v) {
     }
 
-    protected void onNotInUse(View v) {
+    protected void onNotInUse(final View v) {
     }
 
-    protected void onScaleChild(View v, Float scale) {
+    protected void onScaleChild(final View v, final Float scale) {
     }
 
-    public View getView(int i) {
-        return mChildViews.get(i);
+    public View getView(final int i) {
+        return (View)this.mChildViews.get(i);
     }
-
 
     public View getDisplayedView() {
-        return mChildViews.get(mCurrent);
+        return (View)this.mChildViews.get(this.mCurrent);
     }
 
     public void run() {
-        if (!mScroller.isFinished()) {
-            mScroller.computeScrollOffset();
-            int x = mScroller.getCurrX();
-            int y = mScroller.getCurrY();
-            mXScroll += x - mScrollerLastX;
-            mYScroll += y - mScrollerLastY;
-            mScrollerLastX = x;
-            mScrollerLastY = y;
-            requestLayout();
-            mStepper.prod();
-        } else if (!mUserInteracting) {
-            // End of an inertial scroll and the user is not interacting.
-            // The layout is stable
-            View v = mChildViews.get(mCurrent);
-            if (v != null)
-                postSettle(v);
+        if (!this.mScroller.isFinished()) {
+            this.mScroller.computeScrollOffset();
+            final int x = this.mScroller.getCurrX();
+            final int y = this.mScroller.getCurrY();
+            this.mXScroll += x - this.mScrollerLastX;
+            this.mYScroll += y - this.mScrollerLastY;
+            this.mScrollerLastX = x;
+            this.mScrollerLastY = y;
+            this.requestLayout();
+            this.mStepper.prod();
+        }
+        else if (!this.mUserInteracting) {
+            final View v = (View)this.mChildViews.get(this.mCurrent);
+            if (v != null) {
+                this.postSettle(v);
+            }
         }
     }
 
-    public boolean onDown(MotionEvent arg0) {
-        mScroller.forceFinished(true);
+    public boolean onDown(final MotionEvent arg0) {
+        this.mScroller.forceFinished(true);
         return true;
     }
 
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                           float velocityY) {
-        if (mScaling)
+    public boolean onFling(final MotionEvent e1, final MotionEvent e2, final float velocityX, final float velocityY) {
+        if (this.mScaling) {
             return true;
-
-        View v = mChildViews.get(mCurrent);
+        }
+        final View v = (View)this.mChildViews.get(this.mCurrent);
         if (v != null) {
-            Rect bounds = getScrollBounds(v);
+            final Rect bounds = this.getScrollBounds(v);
             switch (directionOfTravel(velocityX, velocityY)) {
-                case MOVING_LEFT:
-                    if (bounds.left >= 0) {
-                        // Fling off to the left bring next view onto screen
-                        View vl = mChildViews.get(mCurrent + 1);
-
-                        if (vl != null) {
-                            if (mAdapter instanceof MuPDFPageAdapter) {
-                                ((MuPDFPageAdapter) mAdapter).PageUp(mCurrent + 1);
-
-                            }
-                            slideViewOntoScreen(vl);
-                            return true;
-                        }
+                case 1: {
+                    if (bounds.left < 0) {
+                        break;
+                    }
+                    final View vl = (View)this.mChildViews.get(this.mCurrent + 1);
+                    if (vl != null) {
+                        this.slideViewOntoScreen(vl);
+                        return true;
                     }
                     break;
-                case MOVING_RIGHT:
-                    if (bounds.right <= 0) {
-                        // Fling off to the right bring previous view onto screen
-                        View vr = mChildViews.get(mCurrent - 1);
-
-                        if (vr != null) {
-                            if (mAdapter instanceof MuPDFPageAdapter) {
-                                ((MuPDFPageAdapter) mAdapter).PageDown(mCurrent - 1);
-
-                            }
-                            slideViewOntoScreen(vr);
-                            return true;
-                        }
-                    }
-                    break;
-                case MOVING_UP:
-                    if (!HORIZONTAL_SCROLLING  && bounds.top >= 0) {
-                        // Fling off to the left bring next view onto screen
-                        View vl = mChildViews.get(mCurrent + 1);
-
-                        if (vl != null) {
-                            if (mAdapter instanceof MuPDFPageAdapter) {
-                                ((MuPDFPageAdapter) mAdapter).PageUp(mCurrent + 1);
-
-                            }
-                            slideViewOntoScreen(vl);
-                            return true;
-                        }
-                    }
-                    break;
-
-                case MOVING_DOWN:
-                    if (!HORIZONTAL_SCROLLING && bounds.bottom <= 0) {
-                        // Fling off to the right bring previous view onto screen
-                        View vr = mChildViews.get(mCurrent - 1);
-                        if (vr != null) {
-                            if (mAdapter instanceof MuPDFPageAdapter) {
-                                ((MuPDFPageAdapter) mAdapter).PageDown(mCurrent - 1);
-
-                            }
-                            slideViewOntoScreen(vr);
-                            return true;
-                        }
-                    }
-                    break;
-            }
-            mScrollerLastX = mScrollerLastY = 0;
-            // If the page has been dragged out of bounds then we want to spring back
-            // nicely. fling jumps back into bounds instantly, so we don't want to use
-            // fling in that case. On the other hand, we don't want to forgo a fling
-            // just because of a slightly off-angle drag taking us out of bounds other
-            // than in the direction of the drag, so we test for out of bounds only
-            // in the direction of travel.
-            //
-            // Also don't fling if out of bounds in any direction by more than fling
-            // margin
-            Rect expandedBounds = new Rect(bounds);
-            expandedBounds.inset(-FLING_MARGIN, -FLING_MARGIN);
-
-            if (withinBoundsInDirectionOfTravel(bounds, velocityX, velocityY)
-                    && expandedBounds.contains(0, 0)) {
-                mScroller.fling(0, 0, (int) velocityX, (int) velocityY, bounds.left, bounds.right, bounds.top, bounds.bottom);
-                mStepper.prod();
-            }
-        }
-
-        return true;
-
-    }
-
-    public void onLongPress(MotionEvent e) {
-
-        Log.i("LONGPRESS", "onFling: ----Called");
-    }
-
-  /*  public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                            float distanceY) {
-        if (!mScaling) {
-            mXScroll -= distanceX;
-            mYScroll -= distanceY;
-            requestLayout();
-        }
-        return true;
-    }*/
-
-
-//continueScrolling this is added for continue scrolling above is old implementation
-
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        if (!mScaling) {
-           // float scrollSpeed = 1f;
-            // Adjust the scaling factor to control the scrolling speed
-            if(continueScrolling){
-                mXScroll -= distanceX * 4f;
-                mYScroll -= distanceY * 4f;
-                Log.e("ContinueScroll", "onScroll:"+mCurrent);
-                if (mAdapter instanceof MuPDFPageAdapter) {
-                    ((MuPDFPageAdapter) mAdapter).PageUp(mCurrent );
-
                 }
-                requestLayout();
-            }else{
-                mXScroll -= distanceX;
-                mYScroll -= distanceY ;
-                requestLayout();
+                case 3: {
+                    if (this.HORIZONTAL_SCROLLING || bounds.top < 0) {
+                        break;
+                    }
+                    final View vl = (View)this.mChildViews.get(this.mCurrent + 1);
+                    if (vl != null) {
+                        this.slideViewOntoScreen(vl);
+                        return true;
+                    }
+                    break;
+                }
+                case 2: {
+                    if (bounds.right > 0) {
+                        break;
+                    }
+                    final View vr = (View)this.mChildViews.get(this.mCurrent - 1);
+                    if (vr != null) {
+                        this.slideViewOntoScreen(vr);
+                        return true;
+                    }
+                    break;
+                }
+                case 4: {
+                    if (this.HORIZONTAL_SCROLLING || bounds.bottom > 0) {
+                        break;
+                    }
+                    final View vr = (View)this.mChildViews.get(this.mCurrent - 1);
+                    if (vr != null) {
+                        this.slideViewOntoScreen(vr);
+                        return true;
+                    }
+                    break;
+                }
             }
-            //for avoiding crash
-           // invalidate(); // Trigger a redraw
-
+            final int n = 0;
+            this.mScrollerLastY = n;
+            this.mScrollerLastX = n;
+            final Rect expandedBounds = new Rect(bounds);
+            expandedBounds.inset(-100, -100);
+            if (withinBoundsInDirectionOfTravel(bounds, velocityX, velocityY) && expandedBounds.contains(0, 0)) {
+                this.mScroller.fling(0, 0, (int)velocityX, (int)velocityY, bounds.left, bounds.right, bounds.top, bounds.bottom);
+                this.mStepper.prod();
+            }
         }
         return true;
     }
 
-
-    public void onShowPress(MotionEvent e) {
+    public void onLongPress(final MotionEvent e) {
     }
 
-    public boolean onSingleTapUp(MotionEvent e) {
+    public boolean onScroll(final MotionEvent e1, final MotionEvent e2, final float distanceX, final float distanceY) {
+        if (!this.mScaling) {
+            this.mXScroll -= (int)distanceX;
+            this.mYScroll -= (int)distanceY;
+            this.requestLayout();
+        }
+        return true;
+    }
+
+    public void onShowPress(final MotionEvent e) {
+    }
+
+    public boolean onSingleTapUp(final MotionEvent e) {
         return false;
     }
 
-    public boolean onScale(ScaleGestureDetector detector) {
-        float previousScale = mScale;
-        float scale_factor = mReflow ? REFLOW_SCALE_FACTOR : 1.0f;
-        float min_scale = MIN_SCALE * scale_factor;
-        float max_scale = MAX_SCALE * scale_factor;
-        mScale = Math.min(Math.max(mScale * detector.getScaleFactor(), min_scale), max_scale);
-
-        if (mReflow) {
-            View v = mChildViews.get(mCurrent);
-            if (v != null)
-                onScaleChild(v, mScale);
-        } else {
-            float factor = mScale / previousScale;
-
-            View v = mChildViews.get(mCurrent);
+    public boolean onScale(final ScaleGestureDetector detector) {
+        final float previousScale = this.mScale;
+        final float scale_factor = this.mReflow ? 0.5f : 1.0f;
+        final float min_scale = 1.0f * scale_factor;
+        final float max_scale = 5.0f * scale_factor;
+        this.mScale = Math.min(Math.max(this.mScale * detector.getScaleFactor(), min_scale), max_scale);
+        if (this.mReflow) {
+            final View v = (View)this.mChildViews.get(this.mCurrent);
             if (v != null) {
-                float currentFocusX = detector.getFocusX();
-                float currentFocusY = detector.getFocusY();
-                // Work out the focus point relative to the view top left
-                int viewFocusX = (int) currentFocusX - (v.getLeft() + mXScroll);
-                int viewFocusY = (int) currentFocusY - (v.getTop() + mYScroll);
-                // Scroll to maintain the focus point
-                mXScroll += viewFocusX - viewFocusX * factor;
-                mYScroll += viewFocusY - viewFocusY * factor;
-
-                if (mLastScaleFocusX >= 0)
-                    mXScroll += currentFocusX - mLastScaleFocusX;
-                if (mLastScaleFocusY >= 0)
-                    mYScroll += currentFocusY - mLastScaleFocusY;
-
-                mLastScaleFocusX = currentFocusX;
-                mLastScaleFocusY = currentFocusY;
-                requestLayout();
+                this.onScaleChild(v, this.mScale);
+            }
+        }
+        else {
+            final float factor = this.mScale / previousScale;
+            final View v2 = (View)this.mChildViews.get(this.mCurrent);
+            if (v2 != null) {
+                final float currentFocusX = detector.getFocusX();
+                final float currentFocusY = detector.getFocusY();
+                final int viewFocusX = (int)currentFocusX - (v2.getLeft() + this.mXScroll);
+                final int viewFocusY = (int)currentFocusY - (v2.getTop() + this.mYScroll);
+                this.mXScroll += (int)(viewFocusX - viewFocusX * factor);
+                this.mYScroll += (int)(viewFocusY - viewFocusY * factor);
+                if (this.mLastScaleFocusX >= 0.0f) {
+                    this.mXScroll += (int)(currentFocusX - this.mLastScaleFocusX);
+                }
+                if (this.mLastScaleFocusY >= 0.0f) {
+                    this.mYScroll += (int)(currentFocusY - this.mLastScaleFocusY);
+                }
+                this.mLastScaleFocusX = currentFocusX;
+                this.mLastScaleFocusY = currentFocusY;
+                this.requestLayout();
             }
         }
         return true;
     }
 
-    public boolean onScaleBegin(ScaleGestureDetector detector) {
-        mScaling = true;
-        // Ignore any scroll amounts yet to be accounted for: the
-        // screen is not showing the effect of them, so they can
-        // only confuse the user
-        mXScroll = mYScroll = 0;
-        mLastScaleFocusX = mLastScaleFocusY = -1;
+    public boolean onScaleBegin(final ScaleGestureDetector detector) {
+        this.mScaling = true;
+        final int n = 0;
+        this.mYScroll = n;
+        this.mXScroll = n;
+        final float n2 = -1.0f;
+        this.mLastScaleFocusY = n2;
+        this.mLastScaleFocusX = n2;
         return true;
     }
 
-    public void onScaleEnd(ScaleGestureDetector detector) {
-        if (mReflow) {
-            applyToChildren(new ViewMapper() {
+    public void onScaleEnd(final ScaleGestureDetector detector) {
+        if (this.mReflow) {
+            this.applyToChildren(new ViewMapper() {
                 @Override
-                public void applyToView(View view) {
-                    onScaleChild(view, mScale);
+                public void applyToView(final View view) {
+                    ReaderView.this.onScaleChild(view, ReaderView.this.mScale);
                 }
             });
         }
-        mScaling = false;
+        this.mScaling = false;
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mScaleGestureDetector.onTouchEvent(event);
-        mGestureDetector.onTouchEvent(event);
-
-        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN) {
-            mUserInteracting = true;
+    public boolean onTouchEvent(final MotionEvent event) {
+        this.mScaleGestureDetector.onTouchEvent(event);
+        this.mGestureDetector.onTouchEvent(event);
+        if ((event.getAction() & 0xFF) == 0x0) {
+            this.mUserInteracting = true;
         }
-        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
-            mUserInteracting = false;
-
-            View v = mChildViews.get(mCurrent);
+        if ((event.getAction() & 0xFF) == 0x1) {
+            this.mUserInteracting = false;
+            final View v = (View)this.mChildViews.get(this.mCurrent);
             if (v != null) {
-                if (mScroller.isFinished()) {
-                    // If, at the end of user interaction, there is no
-                    // current inertial scroll in operation then animate
-                    // the view onto screen if necessary
-                    slideViewOntoScreen(v);
+                if (this.mScroller.isFinished()) {
+                    this.slideViewOntoScreen(v);
                 }
-
-                if (mScroller.isFinished()) {
-                    // If still there is no inertial scroll in operation
-                    // then the layout is stable
-                    postSettle(v);
+                if (this.mScroller.isFinished()) {
+                    this.postSettle(v);
                 }
             }
         }
-
-        requestLayout();
+        this.requestLayout();
         return true;
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        int n = getChildCount();
-        for (int i = 0; i < n; i++)
-            measureView(getChildAt(i));
+        for (int n = this.getChildCount(), i = 0; i < n; ++i) {
+            this.measureView(this.getChildAt(i));
+        }
     }
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+    protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-
         try {
-            onLayout2(changed, left, top, right, bottom);
-        } catch (OutOfMemoryError e) {
+            this.onLayout2(changed, left, top, right, bottom);
+        }
+        catch (OutOfMemoryError e) {
             System.out.println("Out of memory during layout");
-
-            //  we might get an out of memory error.
-            //  so let's display an alert.
-            //  TODOo: a better message, in resources.
-
-            if (!memAlert) {
-                memAlert = true;
-                AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
-                alertDialog.setMessage("Out of memory during layout");
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                memAlert = false;
-                            }
-                        });
+            if (!this.memAlert) {
+                this.memAlert = true;
+                final AlertDialog alertDialog = new AlertDialog.Builder(this.mContext).create();
+                alertDialog.setMessage((CharSequence)"Out of memory during layout");
+                alertDialog.setButton(-3, (CharSequence)"OK", (DialogInterface.OnClickListener)new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        dialog.dismiss();
+                        ReaderView.this.memAlert = false;
+                    }
+                });
                 alertDialog.show();
             }
         }
     }
 
-    private boolean memAlert = false;
-
-    private void onLayout2(boolean changed, int left, int top, int right,
-                           int bottom) {
-        if (mAdapter != null) {
-            // "Edit mode" means when the View is being displayed in the Android GUI editor. (this class
-            // is instantiated in the IDE, so we need to be a bit careful what we do).
-            if (isInEditMode())
+    private void onLayout2(final boolean changed, final int left, final int top, final int right, final int bottom) {
+        if (this.mAdapter != null) {
+            if (this.isInEditMode()) {
                 return;
-
-            View cv = mChildViews.get(mCurrent);
-            Point cvOffset;
-
-            if (!mResetLayout) {
-                // Move to next or previous if current is sufficiently off center
-                if (cv != null) {
-                    boolean move;
-                    cvOffset = subScreenSizeOffset(cv);
-                    // cv.getRight() may be out of date with the current scale
-                    // so add left to the measured width for the correct position
-                    if (HORIZONTAL_SCROLLING) {
-                        move = cv.getLeft() + cv.getMeasuredWidth() + cvOffset.x + GAP / 2 + mXScroll < getWidth() / 2;
-                    } else {
-                        move = cv.getTop() + cv.getMeasuredHeight() + cvOffset.y + GAP / 2 + mYScroll < getHeight() / 2;
-                    }
-                    if (move && mCurrent + 1 < mAdapter.getCount()) {
-                        postUnsettle(cv);
-                        // post to invoke test for end of animation
-                        // where we must set hq area for the new current view
-                        mStepper.prod();
-                        onMoveOffChild(mCurrent);
-                        mCurrent++;
-                        onMoveToChild(mCurrent);
-                    }
-
-                    if (HORIZONTAL_SCROLLING) {
-                        move = cv.getLeft() - cvOffset.x - GAP / 2 + mXScroll >= getWidth() / 2;
-                    } else {
-                        move = cv.getTop() - cvOffset.y - GAP / 2 + mYScroll >= getHeight() / 2;
-                    }
-                    if (move && mCurrent > 0) {
-                        postUnsettle(cv);
-                        // post to invoke test for end of animation
-                        // where we must set hq area for the new current view
-                        mStepper.prod();
-                        onMoveOffChild(mCurrent);
-                        mCurrent--;
-                        onMoveToChild(mCurrent);
-                    }
-                }
-
-                // Remove not needed children and hold them for reuse
-                int numChildren = mChildViews.size();
-                int childIndices[] = new int[numChildren];
-                for (int i = 0; i < numChildren; i++)
-                    childIndices[i] = mChildViews.keyAt(i);
-
-                for (int i = 0; i < numChildren; i++) {
-                    int ai = childIndices[i];
-                    if (ai < mCurrent - 1 || ai > mCurrent + 1) {
-                        View v = mChildViews.get(ai);
-                        onNotInUse(v);
-                        mViewCache.add(v);
-                        removeViewInLayout(v);
-                        mChildViews.remove(ai);
-                    }
-                }
-            } else {
-                mResetLayout = false;
-                mXScroll = mYScroll = 0;
-                // Remove all children and hold them for reuse
-                int numChildren = mChildViews.size();
-                for (int i = 0; i < numChildren; i++) {
-                    View v = mChildViews.valueAt(i);
-                    onNotInUse(v);
-                    mViewCache.add(v);
-                    removeViewInLayout(v);
-                }
-                mChildViews.clear();
-
-                // Don't reuse cached views if the adapter has changed
-                if (mReflowChanged) {
-                    mReflowChanged = false;
-                    mViewCache.clear();
-                }
-
-                // post to ensure generation of hq area
-                mStepper.prod();
             }
-
-            // Ensure current view is present
-            int cvLeft, cvRight, cvTop, cvBottom;
-            boolean notPresent = (mChildViews.get(mCurrent) == null);
-            cv = getOrCreateChild(mCurrent);
-            // When the view is sub-screen-size in either dimension we
-            // offset it to center within the screen area, and to keep
-            // the views spaced out
-            cvOffset = subScreenSizeOffset(cv);
+            View cv = (View)this.mChildViews.get(this.mCurrent);
+            if (!this.mResetLayout) {
+                if (cv != null) {
+                    final Point cvOffset = this.subScreenSizeOffset(cv);
+                    boolean move;
+                    if (this.HORIZONTAL_SCROLLING) {
+                        move = (cv.getLeft() + cv.getMeasuredWidth() + cvOffset.x + 10 + this.mXScroll < this.getWidth() / 2);
+                    }
+                    else {
+                        move = (cv.getTop() + cv.getMeasuredHeight() + cvOffset.y + 10 + this.mYScroll < this.getHeight() / 2);
+                    }
+                    if (move && this.mCurrent + 1 < this.mAdapter.getCount()) {
+                        this.postUnsettle(cv);
+                        this.mStepper.prod();
+                        this.onMoveOffChild(this.mCurrent);
+                        this.onMoveToChild(++this.mCurrent);
+                    }
+                    if (this.HORIZONTAL_SCROLLING) {
+                        move = (cv.getLeft() - cvOffset.x - 10 + this.mXScroll >= this.getWidth() / 2);
+                    }
+                    else {
+                        move = (cv.getTop() - cvOffset.y - 10 + this.mYScroll >= this.getHeight() / 2);
+                    }
+                    if (move && this.mCurrent > 0) {
+                        this.postUnsettle(cv);
+                        this.mStepper.prod();
+                        this.onMoveOffChild(this.mCurrent);
+                        this.onMoveToChild(--this.mCurrent);
+                    }
+                }
+                final int numChildren = this.mChildViews.size();
+                final int[] childIndices = new int[numChildren];
+                for (int i = 0; i < numChildren; ++i) {
+                    childIndices[i] = this.mChildViews.keyAt(i);
+                }
+                for (final int ai : childIndices) {
+                    if (ai < this.mCurrent - 1 || ai > this.mCurrent + 1) {
+                        final View v = (View)this.mChildViews.get(ai);
+                        this.onNotInUse(v);
+                        this.mViewCache.add(v);
+                        this.removeViewInLayout(v);
+                        this.mChildViews.remove(ai);
+                    }
+                }
+            }
+            else {
+                this.mResetLayout = false;
+                final int n = 0;
+                this.mYScroll = n;
+                this.mXScroll = n;
+                for (int numChildren = this.mChildViews.size(), j = 0; j < numChildren; ++j) {
+                    final View v2 = (View)this.mChildViews.valueAt(j);
+                    this.onNotInUse(v2);
+                    this.mViewCache.add(v2);
+                    this.removeViewInLayout(v2);
+                }
+                this.mChildViews.clear();
+                if (this.mReflowChanged) {
+                    this.mReflowChanged = false;
+                    this.mViewCache.clear();
+                }
+                this.mStepper.prod();
+            }
+            final boolean notPresent = this.mChildViews.get(this.mCurrent) == null;
+            cv = this.getOrCreateChild(this.mCurrent);
+            final Point cvOffset = this.subScreenSizeOffset(cv);
+            int cvLeft;
+            int cvTop;
             if (notPresent) {
-                //Main item not already present. Just place it top left
                 cvLeft = cvOffset.x;
                 cvTop = cvOffset.y;
-            } else {
-                // Main item already present. Adjust by scroll offsets
-                cvLeft = cv.getLeft() + mXScroll;
-                cvTop = cv.getTop() + mYScroll;
             }
-            // Scroll values have been accounted for
-            mXScroll = mYScroll = 0;
-            cvRight = cvLeft + cv.getMeasuredWidth();
-            cvBottom = cvTop + cv.getMeasuredHeight();
-
-            if (!mUserInteracting && mScroller.isFinished()) {
-                Point corr = getCorrection(getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
+            else {
+                cvLeft = cv.getLeft() + this.mXScroll;
+                cvTop = cv.getTop() + this.mYScroll;
+            }
+            final int n2 = 0;
+            this.mYScroll = n2;
+            this.mXScroll = n2;
+            int cvRight = cvLeft + cv.getMeasuredWidth();
+            int cvBottom = cvTop + cv.getMeasuredHeight();
+            if (!this.mUserInteracting && this.mScroller.isFinished()) {
+                final Point corr = this.getCorrection(this.getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
                 cvRight += corr.x;
                 cvLeft += corr.x;
                 cvTop += corr.y;
                 cvBottom += corr.y;
-            } else if (cv.getMeasuredHeight() <= getHeight()) {
-                // When the current view is as small as the screen in height, clamp
-                // it vertically
-                Point corr = getCorrection(getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
-                if (HORIZONTAL_SCROLLING) {
+            }
+            else if (cv.getMeasuredHeight() <= this.getHeight()) {
+                final Point corr = this.getCorrection(this.getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
+                if (this.HORIZONTAL_SCROLLING) {
                     cvTop += corr.y;
                     cvBottom += corr.y;
-                } else {
+                }
+                else {
                     cvRight += corr.x;
                     cvLeft += corr.x;
                 }
             }
-
             cv.layout(cvLeft, cvTop, cvRight, cvBottom);
-
-            if (mCurrent > 0) {
-                View lv = getOrCreateChild(mCurrent - 1);
-                Point leftOffset = subScreenSizeOffset(lv);
-                if (HORIZONTAL_SCROLLING) {
-                    int gap = leftOffset.x + GAP + cvOffset.x;
-                    lv.layout(cvLeft - lv.getMeasuredWidth() - gap,
-                            (cvBottom + cvTop - lv.getMeasuredHeight()) / 2,
-                            cvLeft - gap,
-                            (cvBottom + cvTop + lv.getMeasuredHeight()) / 2);
-                } else {
-                    int gap = leftOffset.y + GAP + cvOffset.y;
-                    lv.layout((cvLeft + cvRight - lv.getMeasuredWidth()) / 2,
-                            cvTop - lv.getMeasuredHeight() - gap,
-                            (cvLeft + cvRight + lv.getMeasuredWidth()) / 2,
-                            cvTop - gap);
+            if (this.mCurrent > 0) {
+                final View lv = this.getOrCreateChild(this.mCurrent - 1);
+                final Point leftOffset = this.subScreenSizeOffset(lv);
+                if (this.HORIZONTAL_SCROLLING) {
+                    final int gap = leftOffset.x + 20 + cvOffset.x;
+                    lv.layout(cvLeft - lv.getMeasuredWidth() - gap, (cvBottom + cvTop - lv.getMeasuredHeight()) / 2, cvLeft - gap, (cvBottom + cvTop + lv.getMeasuredHeight()) / 2);
+                }
+                else {
+                    final int gap = leftOffset.y + 20 + cvOffset.y;
+                    lv.layout((cvLeft + cvRight - lv.getMeasuredWidth()) / 2, cvTop - lv.getMeasuredHeight() - gap, (cvLeft + cvRight + lv.getMeasuredWidth()) / 2, cvTop - gap);
                 }
             }
-
-            if (mCurrent + 1 < mAdapter.getCount()) {
-                View rv = getOrCreateChild(mCurrent + 1);
-                Point rightOffset = subScreenSizeOffset(rv);
-                if (HORIZONTAL_SCROLLING) {
-                    int gap = cvOffset.x + GAP + rightOffset.x;
-                    rv.layout(cvRight + gap,
-                            (cvBottom + cvTop - rv.getMeasuredHeight()) / 2,
-                            cvRight + rv.getMeasuredWidth() + gap,
-                            (cvBottom + cvTop + rv.getMeasuredHeight()) / 2);
-                } else {
-                    int gap = cvOffset.y + GAP + rightOffset.y;
-                    rv.layout((cvLeft + cvRight - rv.getMeasuredWidth()) / 2,
-                            cvBottom + gap,
-                            (cvLeft + cvRight + rv.getMeasuredWidth()) / 2,
-                            cvBottom + gap + rv.getMeasuredHeight());
+            if (this.mCurrent + 1 < this.mAdapter.getCount()) {
+                final View rv = this.getOrCreateChild(this.mCurrent + 1);
+                final Point rightOffset = this.subScreenSizeOffset(rv);
+                if (this.HORIZONTAL_SCROLLING) {
+                    final int gap = cvOffset.x + 20 + rightOffset.x;
+                    rv.layout(cvRight + gap, (cvBottom + cvTop - rv.getMeasuredHeight()) / 2, cvRight + rv.getMeasuredWidth() + gap, (cvBottom + cvTop + rv.getMeasuredHeight()) / 2);
+                }
+                else {
+                    final int gap = cvOffset.y + 20 + rightOffset.y;
+                    rv.layout((cvLeft + cvRight - rv.getMeasuredWidth()) / 2, cvBottom + gap, (cvLeft + cvRight + rv.getMeasuredWidth()) / 2, cvBottom + gap + rv.getMeasuredHeight());
                 }
             }
-
-            invalidate();
+            this.invalidate();
         }
     }
 
-    @Override
     public Adapter getAdapter() {
-        return mAdapter;
+        return this.mAdapter;
     }
 
-    @Override
     public View getSelectedView() {
         return null;
     }
 
-    @Override
-    public void setAdapter(Adapter adapter) {
-
-        //  release previous adapter's bitmaps
-        if (null != mAdapter && adapter != mAdapter) {
-            if (adapter instanceof MuPDFPageAdapter) {
-                ((MuPDFPageAdapter) adapter).releaseBitmaps();
-            }
+    public void setAdapter(final Adapter adapter) {
+        if (null != this.mAdapter && adapter != this.mAdapter && adapter instanceof MuPDFPageAdapter) {
+            ((MuPDFPageAdapter)adapter).releaseBitmaps();
         }
-
-        mAdapter = adapter;
-
-        requestLayout();
+        this.mAdapter = adapter;
+        this.requestLayout();
     }
 
-    @Override
-    public void setSelection(int arg0) {
-        throw new UnsupportedOperationException(getContext().getString(R.string.not_supported));
+    public void setSelection(final int arg0) {
+        throw new UnsupportedOperationException(this.getContext().getString(R.string.not_supported));
     }
 
     private View getCached() {
-        if (mViewCache.size() == 0)
+        if (this.mViewCache.size() == 0) {
             return null;
-        else
-            return mViewCache.removeFirst();
+        }
+        return this.mViewCache.removeFirst();
     }
 
-    private View getOrCreateChild(int i) {
-        View v = mChildViews.get(i);
+    private View getOrCreateChild(final int i) {
+        View v = (View)this.mChildViews.get(i);
         if (v == null) {
-            v = mAdapter.getView(i, getCached(), this);
-            addAndMeasureChild(i, v);
-            onChildSetup(i, v);
-            onScaleChild(v, mScale);
+            v = this.mAdapter.getView(i, this.getCached(), (ViewGroup)this);
+            this.addAndMeasureChild(i, v);
+            this.onChildSetup(i, v);
+            this.onScaleChild(v, this.mScale);
         }
-
         return v;
     }
 
-    private void addAndMeasureChild(int i, View v) {
+    private void addAndMeasureChild(final int i, final View v) {
         LayoutParams params = v.getLayoutParams();
         if (params == null) {
-            params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            params = new LayoutParams(-2, -2);
         }
-        addViewInLayout(v, 0, params, true);
-        mChildViews.append(i, v); // Record the view against it's adapter index
-        measureView(v);
+        this.addViewInLayout(v, 0, params, true);
+        this.mChildViews.append(i, v);
+        this.measureView(v);
     }
 
-    private void measureView(View v) {
-        // See what size the view wants to be
-        v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-
-        if (!mReflow) {
-            // Work out a scale that will fit it to this view
-            float scale = Math.min((float) getWidth() / (float) v.getMeasuredWidth(),(float) getHeight() / (float) v.getMeasuredHeight());
-            // Use the fitting values scaled by our current scale factor
-            v.measure(MeasureSpec.EXACTLY | (int) (v.getMeasuredWidth() * (scale)  * mScale), MeasureSpec.EXACTLY | (int) (v.getMeasuredHeight() * (scale) * mScale));//+0.1f
-        } else {
-            v.measure(View.MeasureSpec.EXACTLY | (int) (v.getMeasuredWidth()),
-                    View.MeasureSpec.EXACTLY | (int) (v.getMeasuredHeight()));
-
+    private void measureView(final View v) {
+        v.measure(0, 0);
+        if (!this.mReflow) {
+            final float scale = Math.min(this.getWidth() / (float)v.getMeasuredWidth(), this.getHeight() / (float)v.getMeasuredHeight());
+            v.measure(0x40000000 | (int)(v.getMeasuredWidth() * scale * this.mScale), 0x40000000 | (int)(v.getMeasuredHeight() * scale * this.mScale));
+        }
+        else {
+            v.measure(0x40000000 | v.getMeasuredWidth(), 0x40000000 | v.getMeasuredHeight());
         }
     }
 
-    // large view but zoom out
-/*    private void measureView(View v) {
-        // See what size the view wants to be
-        v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-
-        if (!mReflow) {
-            // Work out a scale that will fit it to this view
-            float scale = Math.min((float) getWidth() / (float) v.getMeasuredWidth(),
-                    (float) getHeight() / (float) v.getMeasuredHeight());
-            // Use the fitting values scaled by our current scale factor
-            v.measure(MeasureSpec.AT_MOST | (int) (v.getMeasuredWidth() * (scale + 0.2f) * mScale),
-                    MeasureSpec.AT_MOST | (int) (v.getMeasuredHeight() * (scale+0.2f) * mScale));
-        } else {
-            v.measure(View.MeasureSpec.EXACTLY | (int) (v.getMeasuredWidth()),
-                    View.MeasureSpec.EXACTLY | (int) (v.getMeasuredHeight()));
-        }
-    }*/
-
-    private Rect getScrollBounds(int left, int top, int right, int bottom) {
-        int xmin = getWidth() - right;
+    private Rect getScrollBounds(final int left, final int top, final int right, final int bottom) {
+        int xmin = this.getWidth() - right;
         int xmax = -left;
-        int ymin = getHeight() - bottom;
+        int ymin = this.getHeight() - bottom;
         int ymax = -top;
-
-        // In either dimension, if view smaller than screen then
-        // constrain it to be central
-        if (xmin > xmax) xmin = xmax = (xmin + xmax) / 2;
-        if (ymin > ymax) ymin = ymax = (ymin + ymax) / 2;
-
+        if (xmin > xmax) {
+            xmax = (xmin = (xmin + xmax) / 2);
+        }
+        if (ymin > ymax) {
+            ymax = (ymin = (ymin + ymax) / 2);
+        }
         return new Rect(xmin, ymin, xmax, ymax);
     }
 
-    private Rect getScrollBounds(View v) {
-        // There can be scroll amounts not yet accounted for in
-        // onLayout, so add mXScroll and mYScroll to the current
-        // positions when calculating the bounds.
-        return getScrollBounds(v.getLeft() + mXScroll,
-                v.getTop() + mYScroll,
-                v.getLeft() + v.getMeasuredWidth() + mXScroll,
-                v.getTop() + v.getMeasuredHeight() + mYScroll);
+    private Rect getScrollBounds(final View v) {
+        return this.getScrollBounds(v.getLeft() + this.mXScroll, v.getTop() + this.mYScroll, v.getLeft() + v.getMeasuredWidth() + this.mXScroll, v.getTop() + v.getMeasuredHeight() + this.mYScroll);
     }
 
-    private Point getCorrection(Rect bounds) {
-        return new Point(Math.min(Math.max(0, bounds.left), bounds.right),
-                Math.min(Math.max(0, bounds.top), bounds.bottom));
+    private Point getCorrection(final Rect bounds) {
+        return new Point(Math.min(Math.max(0, bounds.left), bounds.right), Math.min(Math.max(0, bounds.top), bounds.bottom));
     }
 
     private void postSettle(final View v) {
-        // onSettle and onUnsettle are posted so that the calls
-        // wont be executed until after the system has performed
-        // layout.
-        post(new Runnable() {
+        this.post((Runnable)new Runnable() {
+            @Override
             public void run() {
-                onSettle(v);
+                ReaderView.this.onSettle(v);
             }
         });
     }
 
     private void postUnsettle(final View v) {
-        post(new Runnable() {
+        this.post((Runnable)new Runnable() {
+            @Override
             public void run() {
-                onUnsettle(v);
+                ReaderView.this.onUnsettle(v);
             }
         });
     }
 
-    private void slideViewOntoScreen(View v) {
-        Point corr = getCorrection(getScrollBounds(v));
+    private void slideViewOntoScreen(final View v) {
+        final Point corr = this.getCorrection(this.getScrollBounds(v));
         if (corr.x != 0 || corr.y != 0) {
-            mScrollerLastX = mScrollerLastY = 0;
-            mScroller.startScroll(0, 0, corr.x, corr.y, 400);
-            mStepper.prod();
+            final int n = 0;
+            this.mScrollerLastY = n;
+            this.mScrollerLastX = n;
+            this.mScroller.startScroll(0, 0, corr.x, corr.y, 400);
+            this.mStepper.prod();
         }
     }
 
-    private Point subScreenSizeOffset(View v) {
-        return new Point(Math.max((getWidth() - v.getMeasuredWidth()) / 2, 0), Math.max((getHeight() - v.getMeasuredHeight()) / 2, 0));
+    private Point subScreenSizeOffset(final View v) {
+        return new Point(Math.max((this.getWidth() - v.getMeasuredWidth()) / 2, 0), Math.max((this.getHeight() - v.getMeasuredHeight()) / 2, 0));
     }
 
-    private static int directionOfTravel(float vx, float vy) {
-        if (Math.abs(vx) > 2 * Math.abs(vy))
-            return (vx > 0) ? MOVING_RIGHT : MOVING_LEFT;
-        else if (Math.abs(vy) > 2 * Math.abs(vx))
-            return (vy > 0) ? MOVING_DOWN : MOVING_UP;
-        else
-            return MOVING_DIAGONALLY;
+    private static int directionOfTravel(final float vx, final float vy) {
+        if (Math.abs(vx) > 2.0f * Math.abs(vy)) {
+            return (vx > 0.0f) ? 2 : 1;
+        }
+        if (Math.abs(vy) > 2.0f * Math.abs(vx)) {
+            return (vy > 0.0f) ? 4 : 3;
+        }
+        return 0;
     }
 
-    private static boolean withinBoundsInDirectionOfTravel(Rect bounds, float vx, float vy) {
+    private static boolean withinBoundsInDirectionOfTravel(final Rect bounds, final float vx, final float vy) {
         switch (directionOfTravel(vx, vy)) {
-            case MOVING_DIAGONALLY:
+            case 0: {
                 return bounds.contains(0, 0);
-            case MOVING_LEFT:
+            }
+            case 1: {
                 return bounds.left <= 0;
-            case MOVING_RIGHT:
+            }
+            case 2: {
                 return bounds.right >= 0;
-            case MOVING_UP:
+            }
+            case 3: {
                 return bounds.top <= 0;
-            case MOVING_DOWN:
+            }
+            case 4: {
                 return bounds.bottom >= 0;
-            default:
+            }
+            default: {
                 throw new NoSuchElementException();
+            }
         }
+    }
+
+    public abstract static class ViewMapper
+    {
+        public abstract void applyToView(final View p0);
     }
 }
-
-
-
-
-

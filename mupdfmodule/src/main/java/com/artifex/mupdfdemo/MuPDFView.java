@@ -1,63 +1,70 @@
+//
+// Decompiled by Procyon v0.5.36
+//
+
 package com.artifex.mupdfdemo;
 
-import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.PointF;
 
+public interface MuPDFView
+{
+    void setPage(final int p0, final PointF p1);
 
-public interface MuPDFView{
-    void setPage(int page, PointF size);
-    void setScale(float scale);
+    void setScale(final float p0);
+
     int getPage();
-    void blank(int page);
-    Hit passClickEvent(float x, float y);
-    LinkInfo hitLink(float x, float y);
-    void selectText(float x0, float y0, float x1, float y1);
+
+    void blank(final int p0);
+
+    Hit passClickEvent(final float p0, final float p1);
+
+    LinkInfo hitLink(final float p0, final float p1);
+
+    void selectText(final float p0, final float p1, final float p2, final float p3);
+
     void deselectText();
+
     boolean copySelection();
     boolean isTextSelected();
-    /**
-     * After the text is selected, the text will be processed and annotated according to the type of highlighting, underlining, and strikethrough.
-     * @param type
-     * @return
-     */
-    boolean markupSelection(Annotation.Type type);
-    void deleteSelectedAnnotation();
-    void setSearchBoxes(RectF searchBoxes[]);
-    void setLinkHighlighting(boolean f);
-    void deselectAnnotation();
-    void startDraw(float x, float y);
 
-    void continueDraw(float x, float y);
-    void undoDraw();
-    void redoDraw();
+    boolean markupSelection(final Annotation.Type p0);
+
+    void deleteSelectedAnnotation();
+
+    void setSearchBoxes(final RectF[] p0);
+
+    void setLinkHighlighting(final boolean p0);
+
+    void deselectAnnotation();
+
+    void startDraw(final float p0, final float p1);
+
+    void continueDraw(final float p0, final float p1);
+
     void cancelDraw();
+
     boolean saveDraw();
-    void setChangeReporter(Runnable reporter);
+
+    void setChangeReporter(final Runnable p0);
+
     void update();
-    void updateHq(boolean update);
+
+    void updateHq(final boolean p0);
+
     void removeHq();
+
     void releaseResources();
+
     void releaseBitmaps();
-    /**
-     * Set hyperlink color
-     * @param color color value
-     */
-    void setLinkHighlightColor(int color);
-    /**
-     * Set brush color
-     * @param color color value
-     */
-    void setInkColor(int color);
-    /**
-     * Set brush thickness
-     * @param inkThickness thickness value
-     */
-    void setPaintStrockWidth(float inkThickness);
-    void setPageMode(String nightDayTheme);
-    void setContinuousPageScroll(Boolean continueScroll);
+
+    void setLinkHighlightColor(final int p0);
+
+    void setInkColor(final int p0);
+
+    void setPaintStrockWidth(final float p0);
 
     float getCurrentScale();
-
-    void showCopyRect(float x, float y, Float direction,Boolean isTextSelected,Boolean actionDetection);
+    void showCopyRect(float x, float y);
 
 }

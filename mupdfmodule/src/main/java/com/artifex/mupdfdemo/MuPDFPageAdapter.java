@@ -62,6 +62,17 @@ public class MuPDFPageAdapter extends BaseAdapter {
         mOnPageChangeListener.onPageChanged(i);
     }
 
+    public void PageUp(int i, View pageView){
+        Log.i("PageIs", "PageUp: "+i);
+        mOnPageChangeListener.onPageChanged(i, pageView);
+
+    }
+
+    public void PageDown(int i, View pageView){
+        Log.i("PageIs", "PageDown: "+i);
+        mOnPageChangeListener.onPageChanged(i, pageView);
+    }
+
     public View getView(final int position, View convertView, ViewGroup parent) {
         final MuPDFPageView pageView;
         if (convertView == null) {

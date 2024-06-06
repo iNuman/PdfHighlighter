@@ -9,7 +9,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        minSdk 24
+        minSdk 21
         targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -26,13 +26,19 @@ android {
         }
 
 
-        defaultConfig {
-            ndk {
-                abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
-            }
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips", "x86_64", "arm64-v8a"
+//                abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
         }
-        sourceSets.main {
-            jniLibs.srcDir 'src/main/jniLibs'
+
+    }
+
+//    sourceSets.main {
+//        jniLibs.srcDir 'src/main/jniLibs'
+//    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
         }
     }
     buildTypes {
@@ -45,15 +51,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-
-    kotlinOptions {
-        jvmTarget = '17'
-    }
+//    kotlinOptions {
+//        jvmTarget = "1.8"
+//    }
 }
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.android.material:material:1.12.0'
     testImplementation 'junit:junit:4.13.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.21"
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

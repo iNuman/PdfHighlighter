@@ -1,412 +1,424 @@
+//
+// Decompiled by Procyon v0.5.36
+//
+
 package com.artifex.mupdfdemo;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.PointF;
-import android.graphics.RectF;
+import android.graphics.Color;
 import android.util.Log;
 
-
 import java.util.ArrayList;
+import java.util.Arrays;
 
-@SuppressWarnings("JniMissingFunction")
+//import com.lonelypluto.pdfviewerdemo.R;
+
+import android.content.Context;
+import android.graphics.PointF;
+import android.graphics.RectF;
+import android.graphics.Bitmap;
+
 public class MuPDFCore {
-    private static final String TAG = MuPDFCore.class.getSimpleName();
-    /* load our native library */
-    private static boolean gs_so_available = false;
-    static {
-        Log.e(TAG,"Loading dll");
-        // library written in c and compiled to .so file this way loading that libray
-        System.loadLibrary("mupdf_java");
-        Log.e(TAG,"Loaded dll");
-    }
-
-    /* Readable members */
-    private int numPages = -1;
+    private static final String TAG;
+    private static boolean gs_so_available;
+    private int numPages;
     private float pageWidth;
     private float pageHeight;
     private long globals;
-    private byte fileBuffer[];
+    private byte[] fileBuffer;
     private String file_format;
     private boolean isUnencryptedPDF;
     private final boolean wasOpenedFromBuffer;
 
-    /* The native functions */
     private static native boolean gprfSupportedInternal();
-    private native long openFile(String filename);
-    private native long openBuffer(String magic);
-    private native String fileFormatInternal();
-    private native boolean isUnencryptedPDFInternal();
-    private native int countPagesInternal();
-    private native void gotoPageInternal(int localActionPageNum);
-    private native float getPageWidth();
-    private native float getPageHeight();
-    private native void drawPage(Bitmap bitmap,
-                                 int pageW, int pageH,
-                                 int patchX, int patchY,
-                                 int patchW, int patchH,
-                                 long cookiePtr);
-    private native void updatePageInternal(Bitmap bitmap,
-                                           int page,
-                                           int pageW, int pageH,
-                                           int patchX, int patchY,
-                                           int patchW, int patchH,
-                                           long cookiePtr);
-    private native RectF[] searchPage(String text);
-    private native TextChar[][][][] text();
-    private native byte[] textAsHtml();
-    private native void addMarkupAnnotationInternal(PointF[] quadPoints, int type);
-//	private native void addInkAnnotationInternal(PointF[][] arcs);
 
-    /**
-     * 绘制
-     * @param arcs 点
-     * @param colorR 颜色值 R
-     * @param colorG 颜色值 G
-     * @param colorB 颜色值 B
-     * @param inkThickness 线的粗细
-     */
-    private native void addInkAnnotationInternal(PointF[][] arcs, float colorR, float colorG, float colorB, float inkThickness);
-    private native void deleteAnnotationInternal(int annot_index);
-    private native int passClickEventInternal(int page, float x, float y);
-    private native void setFocusedWidgetChoiceSelectedInternal(String[] selected);
+    private native long openFile(final String p0);
+
+    private native long openBuffer(final String p0);
+
+    private native String fileFormatInternal();
+
+    private native boolean isUnencryptedPDFInternal();
+
+    private native int countPagesInternal();
+
+    private native void gotoPageInternal(final int p0);
+
+    private native float getPageWidth();
+
+    private native float getPageHeight();
+
+    private native void drawPage(final Bitmap p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final long p7);
+
+    private native void updatePageInternal(final Bitmap p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final int p7, final long p8);
+
+    private native RectF[] searchPage(final String p0);
+
+    private native TextChar[][][][] text();
+
+    private native byte[] textAsHtml();
+
+    private native void addMarkupAnnotationInternal(final PointF[] p0, final int p1, float[] colors);
+
+    private native void addInkAnnotationInternal(final PointF[][] p0, final float[] colors, final float p4);
+
+    private native void deleteAnnotationInternal(final int p0);
+
+    private native int passClickEventInternal(final int p0, final float p1, final float p2);
+
+    private native void setFocusedWidgetChoiceSelectedInternal(final String[] p0);
+
     private native String[] getFocusedWidgetChoiceSelected();
+
     private native String[] getFocusedWidgetChoiceOptions();
+
     private native int getFocusedWidgetSignatureState();
+
     private native String checkFocusedSignatureInternal();
-    private native boolean signFocusedSignatureInternal(String keyFile, String password);
-    private native int setFocusedWidgetTextInternal(String text);
+
+    private native boolean signFocusedSignatureInternal(final String p0, final String p1);
+
+    private native int setFocusedWidgetTextInternal(final String p0);
+
     private native String getFocusedWidgetTextInternal();
+
     private native int getFocusedWidgetTypeInternal();
-    private native LinkInfo[] getPageLinksInternal(int page);
-    private native RectF[] getWidgetAreasInternal(int page);
-    private native Annotation[] getAnnotationsInternal(int page);
+
+    private native LinkInfo[] getPageLinksInternal(final int p0);
+
+    private native RectF[] getWidgetAreasInternal(final int p0);
+
+    private native Annotation[] getAnnotationsInternal(final int p0);
+
     private native OutlineItem[] getOutlineInternal();
+
     private native boolean hasOutlineInternal();
+
     private native boolean needsPasswordInternal();
-    private native boolean authenticatePasswordInternal(String password);
+
+    private native boolean authenticatePasswordInternal(final String p0);
+
     private native MuPDFAlertInternal waitForAlertInternal();
-    private native void replyToAlertInternal(MuPDFAlertInternal alert);
+
+    private native void replyToAlertInternal(final MuPDFAlertInternal p0);
+
     private native void startAlertsInternal();
+
     private native void stopAlertsInternal();
+
     private native void destroying();
+
     private native boolean hasChangesInternal();
+
     private native void saveInternal();
+
     private native long createCookie();
-    private native void destroyCookie(long cookie);
-    private native void abortCookie(long cookie);
-    private native String startProofInternal(int resolution);
-    private native void endProofInternal(String filename);
-    private native int getNumSepsOnPageInternal(int page);
-    private native int controlSepOnPageInternal(int page, int sep, boolean disable);
-    private native Separation getSepInternal(int page, int sep);
+
+    private native void destroyCookie(final long p0);
+
+    private native void abortCookie(final long p0);
+
+    private native String startProofInternal(final int p0);
+
+    private native void endProofInternal(final String p0);
+
+    private native int getNumSepsOnPageInternal(final int p0);
+
+    private native int controlSepOnPageInternal(final int p0, final int p1, final boolean p2);
+
+    private native Separation getSepInternal(final int p0, final int p1);
+
     public native boolean javascriptSupported();
 
-    public class Cookie
-    {
-        private final long cookiePtr;
-
-        public Cookie()
-        {
-            cookiePtr = createCookie();
-            if (cookiePtr == 0)
-                throw new OutOfMemoryError();
-        }
-
-        public void abort()
-        {
-            abortCookie(cookiePtr);
-        }
-
-        public void destroy()
-        {
-            // We could do this in finalize, but there's no guarantee that
-            // a finalize will occur before the muPDF context occurs.
-            destroyCookie(cookiePtr);
-        }
-    }
-
-    public MuPDFCore(Context context, String filename) throws Exception
-    {
-        globals = openFile(filename);
-        if (globals == 0)
-        {
+    public MuPDFCore(final Context context, final String filename) throws Exception {
+        this.numPages = -1;
+        this.globals = this.openFile(filename);
+        if (this.globals == 0L) {
             throw new Exception(String.format(context.getString(R.string.cannot_open_file_Path), filename));
         }
-        file_format = fileFormatInternal();
-        isUnencryptedPDF = isUnencryptedPDFInternal();
-        wasOpenedFromBuffer = false;
+        this.file_format = this.fileFormatInternal();
+        this.isUnencryptedPDF = this.isUnencryptedPDFInternal();
+        this.wasOpenedFromBuffer = false;
     }
 
-    public MuPDFCore(Context context, byte buffer[], String magic) throws Exception {
-        fileBuffer = buffer;
-        globals = openBuffer(magic != null ? magic : "");
-        if (globals == 0)
-        {
+    public MuPDFCore(final Context context, final byte[] buffer, final String magic) throws Exception {
+        this.numPages = -1;
+        this.fileBuffer = buffer;
+        this.globals = this.openBuffer((magic != null) ? magic : "");
+        if (this.globals == 0L) {
             throw new Exception(context.getString(R.string.cannot_open_buffer));
         }
-        file_format = fileFormatInternal();
-        isUnencryptedPDF = isUnencryptedPDFInternal();
-        wasOpenedFromBuffer = true;
+        this.file_format = this.fileFormatInternal();
+        this.isUnencryptedPDF = this.isUnencryptedPDFInternal();
+        this.wasOpenedFromBuffer = true;
     }
 
-    public int countPages()
-    {
-        if (numPages < 0)
-            numPages = countPagesSynchronized();
-        return numPages;
+    public int countPages() {
+        if (this.numPages < 0) {
+            this.numPages = this.countPagesSynchronized();
+        }
+        return this.numPages;
     }
 
-    public String fileFormat()
-    {
-        return file_format;
+    public String fileFormat() {
+        return this.file_format;
     }
 
-    public boolean isUnencryptedPDF()
-    {
-        return isUnencryptedPDF;
+    public boolean isUnencryptedPDF() {
+        return this.isUnencryptedPDF;
     }
 
-    public boolean wasOpenedFromBuffer()
-    {
-        return wasOpenedFromBuffer;
+    public boolean wasOpenedFromBuffer() {
+        return this.wasOpenedFromBuffer;
     }
 
     private synchronized int countPagesSynchronized() {
-        return countPagesInternal();
+        return this.countPagesInternal();
     }
 
-    /* Shim function */
-    private void gotoPage(int page)
-    {
-        if (page > numPages-1)
-            page = numPages-1;
-        else if (page < 0)
+    private void gotoPage(int page) {
+        if (page > this.numPages - 1) {
+            page = this.numPages - 1;
+        } else if (page < 0) {
             page = 0;
-        gotoPageInternal(page);
-        this.pageWidth = getPageWidth();
-        this.pageHeight = getPageHeight();
+        }
+        this.gotoPageInternal(page);
+        this.pageWidth = this.getPageWidth();
+        this.pageHeight = this.getPageHeight();
     }
 
-    public synchronized PointF getPageSize(int page) {
-        gotoPage(page);
-        return new PointF(pageWidth, pageHeight);
+    public synchronized PointF getPageSize(final int page) {
+        this.gotoPage(page);
+        return new PointF(this.pageWidth, this.pageHeight);
     }
 
     public MuPDFAlert waitForAlert() {
-        MuPDFAlertInternal  alert = waitForAlertInternal();
-        return alert != null ? alert.toAlert() : null;
+        final MuPDFAlertInternal alert = this.waitForAlertInternal();
+        return (alert != null) ? alert.toAlert() : null;
     }
 
-    public void replyToAlert(MuPDFAlert alert) {
-        replyToAlertInternal(new MuPDFAlertInternal(alert));
+    public void replyToAlert(final MuPDFAlert alert) {
+        this.replyToAlertInternal(new MuPDFAlertInternal(alert));
     }
 
     public void stopAlerts() {
-        stopAlertsInternal();
+        this.stopAlertsInternal();
     }
 
     public void startAlerts() {
-        startAlertsInternal();
+        this.startAlertsInternal();
     }
 
     public synchronized void onDestroy() {
-        destroying();
-        globals = 0;
+        this.destroying();
+        this.globals = 0L;
     }
 
-    public synchronized void drawPage(Bitmap bm, int page,
-                                      int pageW, int pageH,
-                                      int patchX, int patchY,
-                                      int patchW, int patchH,
-                                    Cookie cookie) {
-        gotoPage(page);
-        drawPage(bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
+    public synchronized void drawPage(final Bitmap bm, final int page, final int pageW, final int pageH, final int patchX, final int patchY, final int patchW, final int patchH, final Cookie cookie) {
+        this.gotoPage(page);
+        this.drawPage(bm, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
     }
 
-    public synchronized void updatePage(Bitmap bm, int page,
-                                        int pageW, int pageH,
-                                        int patchX, int patchY,
-                                        int patchW, int patchH,
-                                      Cookie cookie) {
-        updatePageInternal(bm, page, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
+    public synchronized void updatePage(final Bitmap bm, final int page, final int pageW, final int pageH, final int patchX, final int patchY, final int patchW, final int patchH, final Cookie cookie) {
+        this.updatePageInternal(bm, page, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
     }
 
-    public synchronized PassClickResult passClickEvent(int page, float x, float y) {
-        boolean changed = passClickEventInternal(page, x, y) != 0;
-
-        switch (WidgetType.values()[getFocusedWidgetTypeInternal()])
-        {
-            case TEXT:
-                return new PassClickResultText(changed, getFocusedWidgetTextInternal());
+    public synchronized PassClickResult passClickEvent(final int page, final float x, final float y) {
+        final boolean changed = this.passClickEventInternal(page, x, y) != 0;
+        switch (WidgetType.values()[this.getFocusedWidgetTypeInternal()]) {
+            case TEXT: {
+                return new PassClickResultText(changed, this.getFocusedWidgetTextInternal());
+            }
             case LISTBOX:
-            case COMBOBOX:
-                return new PassClickResultChoice(changed, getFocusedWidgetChoiceOptions(), getFocusedWidgetChoiceSelected());
-            case SIGNATURE:
-                return new PassClickResultSignature(changed, getFocusedWidgetSignatureState());
-            default:
+            case COMBOBOX: {
+                return new PassClickResultChoice(changed, this.getFocusedWidgetChoiceOptions(), this.getFocusedWidgetChoiceSelected());
+            }
+            case SIGNATURE: {
+                return new PassClickResultSignature(changed, this.getFocusedWidgetSignatureState());
+            }
+            default: {
                 return new PassClickResult(changed);
+            }
         }
-
     }
 
-    public synchronized boolean setFocusedWidgetText(int page, String text) {
-        boolean success;
-        gotoPage(page);
-        success = setFocusedWidgetTextInternal(text) != 0;
-
+    public synchronized boolean setFocusedWidgetText(final int page, final String text) {
+        this.gotoPage(page);
+        final boolean success = this.setFocusedWidgetTextInternal(text) != 0;
         return success;
     }
 
-    public synchronized void setFocusedWidgetChoiceSelected(String[] selected) {
-        setFocusedWidgetChoiceSelectedInternal(selected);
+    public synchronized void setFocusedWidgetChoiceSelected(final String[] selected) {
+        this.setFocusedWidgetChoiceSelectedInternal(selected);
     }
 
     public synchronized String checkFocusedSignature() {
-        return checkFocusedSignatureInternal();
+        return this.checkFocusedSignatureInternal();
     }
 
-    public synchronized boolean signFocusedSignature(String keyFile, String password) {
-        return signFocusedSignatureInternal(keyFile, password);
+    public synchronized boolean signFocusedSignature(final String keyFile, final String password) {
+        return this.signFocusedSignatureInternal(keyFile, password);
     }
 
-    public synchronized LinkInfo[] getPageLinks(int page) {
-        return getPageLinksInternal(page);
+    public synchronized LinkInfo[] getPageLinks(final int page) {
+        return this.getPageLinksInternal(page);
     }
 
-    public synchronized RectF[] getWidgetAreas(int page) {
-        return getWidgetAreasInternal(page);
+    public synchronized RectF[] getWidgetAreas(final int page) {
+        return this.getWidgetAreasInternal(page);
     }
 
-    public synchronized Annotation[] getAnnoations(int page) {
-        return getAnnotationsInternal(page);
+    public synchronized Annotation[] getAnnoations(final int page) {
+        return this.getAnnotationsInternal(page);
     }
 
-    public synchronized RectF[] searchPage(int page, String text) {
-        gotoPage(page);
-        return searchPage(text);
+    public synchronized RectF[] searchPage(final int page, final String text) {
+        this.gotoPage(page);
+        return this.searchPage(text);
     }
 
-    public synchronized byte[] html(int page) {
-        gotoPage(page);
-        return textAsHtml();
+    public synchronized byte[] html(final int page) {
+        this.gotoPage(page);
+        return this.textAsHtml();
     }
 
-    public synchronized TextWord[][] textLines(int page) {
-        gotoPage(page);
-        TextChar[][][][] chars = text();
-
-        // The text of the page held in a hierarchy (blocks, lines, spans).
-        // Currently we don't need to distinguish the blocks level or
-        // the spans, and we need to collect the text into words.
-        ArrayList<TextWord[]> lns = new ArrayList<TextWord[]>();
-
-        for (TextChar[][][] bl: chars) {
-            if (bl == null)
-                continue;
-            for (TextChar[][] ln: bl) {
-                ArrayList<TextWord> wds = new ArrayList<TextWord>();
-                TextWord wd = new TextWord();
-
-                for (TextChar[] sp: ln) {
-                    for (TextChar tc: sp) {
-                        if (tc.c != ' ') {
-                            wd.Add(tc);
-                           // Log.i("TEXTSPACEISSUE", "textLinesTextCharacter: "+tc.c);
-                        } else if (wd.w.length() > 0) {
-                            Log.i("TEXTSPACEISSUE", "textLines: "+wd.w);
-                            wds.add(wd);
-                            wd = new TextWord();
+    public synchronized TextWord[][] textLines(final int page) {
+        this.gotoPage(page);
+        final TextChar[][][][] chars = this.text();
+        final ArrayList<TextWord[]> lns = new ArrayList<TextWord[]>();
+        for (final TextChar[][][] bl : chars) {
+            if (bl != null) {
+                for (final TextChar[][] ln : bl) {
+                    final ArrayList<TextWord> wds = new ArrayList<TextWord>();
+                    TextWord wd = new TextWord();
+                    for (final TextChar[] array4 : ln) {
+                        final TextChar[] sp = array4;
+                        for (final TextChar tc : array4) {
+                            if (tc.c != ' ') {
+                                wd.Add(tc);
+                            } else if (wd.w.length() > 0) {
+                                wds.add(wd);
+                                wd = new TextWord();
+                            }
                         }
                     }
+                    if (wd.w.length() > 0) {
+                        wds.add(wd);
+                    }
+                    if (wds.size() > 0) {
+                        lns.add(wds.toArray(new TextWord[wds.size()]));
+                    }
                 }
-
-                if (wd.w.length() > 0)
-                    wds.add(wd);
-
-                if (wds.size() > 0)
-                    lns.add(wds.toArray(new TextWord[wds.size()]));
             }
         }
-
         return lns.toArray(new TextWord[lns.size()][]);
     }
 
-    public synchronized void addMarkupAnnotation(int page, PointF[] quadPoints, Annotation.Type type) {
-        gotoPage(page);
-        addMarkupAnnotationInternal(quadPoints, type.ordinal());
+    public synchronized void addMarkupAnnotation(final int page, final PointF[] quadPoints, final Annotation.Type type, int color) {
+        this.gotoPage(page);
+//        int color = Color.parseColor("#4caf50");
+        float[] colors = new float[3]; // color rgba
+        colors[0] = Color.red(color) / 255f;
+        colors[1] = Color.green(color) / 255f;
+        colors[2] = Color.blue(color) / 255f;
+//        colors[3] = Color.alpha(color) / 255f;
+        Log.d(TAG, String.format(" addMarkupAnnotation color is %s", Arrays.toString(colors)));
+        this.addMarkupAnnotationInternal(quadPoints, type.ordinal(), colors);
     }
 
-//	public synchronized void addInkAnnotation(int page, PointF[][] arcs) {
-//		gotoPage(page);
-//		addInkAnnotationInternal(arcs);
-//	}
-
-    public synchronized void addInkAnnotation(int page, PointF[][] arcs, float color[], float inkThickness) {
-        gotoPage(page);
-        Log.e("zyw", "color = " + color[0] + " " + color[1] + " " + color[2]);
-        addInkAnnotationInternal(arcs, color[0], color[1], color[2], inkThickness);
+    public synchronized void addInkAnnotation(final int page, final PointF[][] arcs, int color, final float inkThickness) {
+        this.gotoPage(page);
+        float[] colors = new float[4]; // color rgba
+        colors[0] = Color.red(color) / 255f;
+        colors[1] = Color.green(color) / 255f;
+        colors[2] = Color.blue(color) / 255f;
+        colors[3] = Color.alpha(color) / 255f;
+//        colors[3] = Color.alpha(color) / 255f;
+        Log.d(TAG, String.format(" addInkAnnotation color is %s", Arrays.toString(colors)));
+        this.addInkAnnotationInternal(arcs, colors, inkThickness);
     }
 
-    public synchronized void deleteAnnotation(int page, int annot_index) {
-        gotoPage(page);
-        deleteAnnotationInternal(annot_index);
+    public synchronized void deleteAnnotation(final int page, final int annot_index) {
+        this.gotoPage(page);
+        this.deleteAnnotationInternal(annot_index);
     }
 
     public synchronized boolean hasOutline() {
-        return hasOutlineInternal();
+        return this.hasOutlineInternal();
     }
 
     public synchronized OutlineItem[] getOutline() {
-        return getOutlineInternal();
+        return this.getOutlineInternal();
     }
 
     public synchronized boolean needsPassword() {
-        return needsPasswordInternal();
+        return this.needsPasswordInternal();
     }
 
-    public synchronized boolean authenticatePassword(String password) {
-        return authenticatePasswordInternal(password);
+    public synchronized boolean authenticatePassword(final String password) {
+        return this.authenticatePasswordInternal(password);
     }
 
     public synchronized boolean hasChanges() {
-        Log.i("SAVETask", "hasChanges: here come ");
-        return hasChangesInternal();
+        return this.hasChangesInternal();
     }
 
     public synchronized void save() {
-        Log.i("SAVETask", "save: here come ");
-
-        saveInternal();
+        this.saveInternal();
     }
 
-    public synchronized String startProof(int resolution) {
-        return startProofInternal(resolution);
+    public synchronized String startProof(final int resolution) {
+        return this.startProofInternal(resolution);
     }
 
-    public synchronized void endProof(String filename) {
-        endProofInternal(filename);
+    public synchronized void endProof(final String filename) {
+        this.endProofInternal(filename);
     }
 
     public static boolean gprfSupported() {
-        return gs_so_available != false && gprfSupportedInternal();
+        return MuPDFCore.gs_so_available && gprfSupportedInternal();
     }
 
-    public boolean canProof()
-    {
-        String format = fileFormat();
+    public boolean canProof() {
+        final String format = this.fileFormat();
         return format.contains("PDF");
     }
 
-    public synchronized int getNumSepsOnPage(int page) {
-        return getNumSepsOnPageInternal(page);
+    public synchronized int getNumSepsOnPage(final int page) {
+        return this.getNumSepsOnPageInternal(page);
     }
 
-    public synchronized int controlSepOnPage(int page, int sep, boolean disable) {
-        return controlSepOnPageInternal(page, sep, disable);
+    public synchronized int controlSepOnPage(final int page, final int sep, final boolean disable) {
+        return this.controlSepOnPageInternal(page, sep, disable);
     }
 
-    public synchronized Separation getSep(int page, int sep) {
-        return getSepInternal(page, sep);
+    public synchronized Separation getSep(final int page, final int sep) {
+        return this.getSepInternal(page, sep);
+    }
+
+    static {
+        TAG = MuPDFCore.class.getSimpleName();
+        MuPDFCore.gs_so_available = false;
+        Log.e(MuPDFCore.TAG, "Loading dll");
+        System.loadLibrary("mupdf_java");
+        Log.e(MuPDFCore.TAG, "Loaded dll");
+    }
+
+    public class Cookie {
+        private final long cookiePtr;
+
+        public Cookie() {
+            this.cookiePtr = MuPDFCore.this.createCookie();
+            if (this.cookiePtr == 0L) {
+                throw new OutOfMemoryError();
+            }
+        }
+
+        public void abort() {
+            MuPDFCore.this.abortCookie(this.cookiePtr);
+        }
+
+        public void destroy() {
+            MuPDFCore.this.destroyCookie(this.cookiePtr);
+        }
     }
 }
