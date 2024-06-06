@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "My Application"
+rootProject.name = "Pdf Editor Highlighter"
 include(":app")
 include(":mupdfmodule")
 
